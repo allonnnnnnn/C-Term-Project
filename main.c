@@ -205,6 +205,11 @@ void addPatient() {
 }
 
 void dischargePatient() {
+    if (totalPatients == 0) {
+        printf("There are no registered patients. Please make some patients.");
+        return;
+    }
+
     int id;
     int patientIndex;
     int foundPatient = 0;
@@ -221,7 +226,7 @@ void dischargePatient() {
         }
 
         if (foundPatient == 0) {
-            printf("Did not find patient. Please try again: ");
+            printf("Did not find patient. Please try again: \n");
             scanf("%d", &id);
         }
     }
@@ -237,7 +242,7 @@ void dischargePatient() {
     }
     totalPatients--;
 
-    printf("Removed patient #%d", id);
+    printf("Removed patient #%d\n", id);
 }
 
 void manageDoctorSchedule() {
