@@ -48,7 +48,7 @@ int main(void)
             searchPatient();
             break;
         case 4:
-            // dischargePatient();
+            dischargePatient();
             break;
         case 5:
             // manageDoctorSchedule();
