@@ -201,6 +201,7 @@ void addPatient() {
     patientAge[totalPatients] = age;
     strcpy(patientDiagnosis[totalPatients], diagnosis);
     patientRoomNumber[totalPatients] = roomNumber;
+
     totalPatients++;
 }
 
