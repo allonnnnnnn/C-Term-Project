@@ -15,7 +15,7 @@ void viewRecords();
 void searchPatient();
 void searchPatientByID();
 void searchPatientByName();
-// void dischargePatient();
+void dischargePatient();
 // void manageDoctorSchedule();
 
 int main(void)
@@ -138,7 +138,10 @@ void searchPatientByID()
            "\nPatient's Age: %d"
            "\nPatient's Diagnosis: %s"
            "\nPatient's Room Number: %d",
-           patientName[input], patientAge[input], patientDiagnosis[input], patientRoomNumber[input]);
+           patientName[input],
+           patientAge[input],
+           patientDiagnosis[input],
+           patientRoomNumber[input]);
 }
 
 void searchPatientByName()
