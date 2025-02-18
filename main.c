@@ -1,30 +1,93 @@
 #include <stdio.h>
 #include <string.h>
 
-int patientID[50];
-char patientName[50][50];
-int patientAge[50];
-char patientDiagnosis[50][50];
-int patientRoomNumber[50];
-char doctorSchedule[7][3];
+void addPatient(int patientID[],
+                char patientName[][50],
+                int patientAge[],
+                char patientDiagnosis[][50],
+                int patientRoomNumber[],
+                int *totalPatients);
 
-int totalPatients = 0;
+void viewRecords(int patientID[],
+                 char patientName[][50],
+                 int patientAge[],
+                 char patientDiagnosis[][50],
+                 int patientRoomNumber[],
+                 int totalPatients);
 
-void addPatient();
-void viewRecords();
-void searchPatient();
-void searchPatientByID();
-void searchPatientByName();
-void dischargePatient();
-void manageDoctorSchedule();
+void searchPatient(int patientID[],
+                   char patientName[][50],
+                   int patientAge[],
+                   char patientDiagnosis[][50],
+                   int patientRoomNumber[],
+                   int totalPatients);
 
-int main(void) {
+void searchPatientByID(int patientID[],
+                       char patientName[][50],
+                       int patientAge[],
+                       char patientDiagnosis[][50],
+                       int patientRoomNumber[],
+                       int totalPatients);
+
+void searchPatientByName(int patientID[],
+                         char patientName[][50],
+                         int patientAge[],
+                         char patientDiagnosis[][50],
+                         int patientRoomNumber[],
+                         int totalPatients);
+
+void dischargePatient(int patientID[],
+                      char patientName[][50],
+                      int patientAge[],
+                      char patientDiagnosis[][50],
+                      int patientRoomNumber[],
+                      int *totalPatients);
+
+void manageDoctors(int doctorsSchedule[][3],
+                   char doctors[][50],
+                   int *totalDoctors);
+
+void addDoctor(char doctors[][50],
+               int *totalDoctors);
+
+void viewAllDoctors(char doctors[][50],
+                    int *totalDoctors);
+
+void manageDoctorsSchedule(int doctorsSchedule[][3],
+                           int totalDoctors);
+
+void viewDoctorsSchedule(char doctors[][50],
+                         int doctorsSchedule[][3]);
+
+int main(void)
+{
+    int patientID[50];
+    char patientName[50][50];
+    int patientAge[50];
+    char patientDiagnosis[50][50];
+    int patientRoomNumber[50];
+    int doctorSchedule[7][3];
+    char doctors[21][50];
+
+    int totalDoctors = 0;
+    int totalPatients = 0;
     int input = 1;
 
-    while (input != 6) {
+    //Initialize the array to no doctors being scheduled (-1 in this case)
+    for (int i = 0; i < 7; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            doctorSchedule[i][j] = -1;
+        }
+    }
+
+    //System loop
+    while (input != 6)
+    {
         printf("\n1. Add Patient Record \n"
             "2. View All Patients\n"
-            "3. Search Patient by ID\n"
+            "3. Search Patient by ID or Name\n"
             "4. Discharge Patient\n"
             "5. Manage Doctor Schedule\n"
             "6. Exit\n");
@@ -32,21 +95,44 @@ int main(void) {
         scanf("%d", &input);
         getchar();
 
-        switch (input) {
+        switch (input)
+        {
             case 1:
-                addPatient();
+                addPatient(patientID,
+                           patientName,
+                           patientAge,
+                           patientDiagnosis,
+                           patientRoomNumber,
+                           &totalPatients);
                 break;
             case 2:
-                viewRecords();
+                viewRecords(patientID,
+                            patientName,
+                            patientAge,
+                            patientDiagnosis,
+                            patientRoomNumber,
+                            totalPatients);
                 break;
             case 3:
-                searchPatient();
+                searchPatient(patientID,
+                              patientName,
+                              patientAge,
+                              patientDiagnosis,
+                              patientRoomNumber,
+                              totalPatients);
                 break;
             case 4:
-                dischargePatient();
+                dischargePatient(patientID,
+                                 patientName,
+                                 patientAge,
+                                 patientDiagnosis,
+                                 patientRoomNumber,
+                                 &totalPatients);
                 break;
             case 5:
-                manageDoctorSchedule();
+                manageDoctors(doctorSchedule,
+                              doctors,
+                              &totalDoctors);
                 break;
             case 6:
                 break;
@@ -56,9 +142,16 @@ int main(void) {
     return 0;
 }
 
-void viewRecords() {
+void viewRecords(int patientID[],
+                 char patientName[][50],
+                 int patientAge[],
+                 char patientDiagnosis[][50],
+                 int patientRoomNumber[],
+                 int totalPatients)
+{
     printf("\nID\t|\t\tName\t\t |\tAge \t|\tDiagnosis\t|\tRoom Number\t\n");
-    for (int i = 0; i < totalPatients; i++) {
+    for (int i = 0; i < totalPatients; i++)
+    {
         printf("%d\t|\t\t%s\t\t |\t%d \t|\t%s\t|\t%d\n",
                patientID[i],
                patientName[i],
@@ -69,32 +162,58 @@ void viewRecords() {
     printf("\n");
 }
 
-void searchPatient() {
+void searchPatient(int patientID[],
+                   char patientName[][50],
+                   int patientAge[],
+                   char patientDiagnosis[][50],
+                   int patientRoomNumber[],
+                   int totalPatients)
+{
     int input;
     int task = 0;
 
-    while (task == 0) {
-        printf("How would you like to search for a patient:");
+    while (task == 0)
+    {
+        printf("\nHow would you like to search for a patient:");
         printf("\n1. search by patient id");
         printf("\n2. search by patient name\n");
         scanf("%d", &input);
         getchar();
-        if (input < 1 || input > 2) {
+        if (input < 1 || input > 2)
+        {
             printf("Invalid input, please try again");
             continue;
         }
 
-        if (input == 1) {
-            searchPatientByID();
+        if (input == 1)
+        {
+            searchPatientByID(patientID,
+                              patientName,
+                              patientAge,
+                              patientDiagnosis,
+                              patientRoomNumber,
+                              totalPatients);
             task = 1;
-        } else {
-            searchPatientByName();
+        } else
+        {
+            searchPatientByName(patientID,
+                                patientName,
+                                patientAge,
+                                patientDiagnosis,
+                                patientRoomNumber,
+                                totalPatients);
             task = 1;
         }
     }
 }
 
-void searchPatientByID() {
+void searchPatientByID(int patientID[],
+                       char patientName[][50],
+                       int patientAge[],
+                       char patientDiagnosis[][50],
+                       int patientRoomNumber[],
+                       int totalPatients)
+{
     int input = 0;
     int doesExist = 0;
 
@@ -102,14 +221,18 @@ void searchPatientByID() {
     scanf("%d", &input);
     getchar();
 
-    while (doesExist == 0) {
-        for (int i = 0; i < totalPatients; i++) {
-            if (input == patientID[i]) {
+    while (doesExist == 0)
+    {
+        for (int i = 0; i < totalPatients; i++)
+        {
+            if (input == patientID[i])
+            {
                 doesExist = 1;
             }
         }
 
-        if (!doesExist) {
+        if (!doesExist)
+        {
             printf("Invalid input. Please try again");
 
             scanf("%d", &input);
@@ -127,28 +250,48 @@ void searchPatientByID() {
            patientRoomNumber[input]);
 }
 
-void searchPatientByName() {
+void searchPatientByName(int patientID[],
+                         char patientName[][50],
+                         int patientAge[],
+                         char patientDiagnosis[][50],
+                         int patientRoomNumber[],
+                         int totalPatients)
+{
     char name[50];
     int index = -1;
     printf("\nEnter Patient Name:");
     fgets(name, 50, stdin);
     name[strcspn(name, "\n")] = 0;
-    for (int i = 0; i < totalPatients; i++) {
-        if (strcmp(patientName[i], name) == 0) {
+    for (int i = 0; i < totalPatients; i++)
+    {
+        if (strcmp(patientName[i], name) == 0)
+        {
             index = i;
             break;
         }
     }
 
-    if (index != -1) {
-        printf("Patient found: ID: %d Name: %s, Age: %d, Diagnosis: %s, Room Number: %d\n", patientID[index],
-               patientName[index], patientAge[index], patientDiagnosis[index], patientRoomNumber[index]);
-    } else {
+    if (index != -1)
+    {
+        printf("Patient found: ID: %d Name: %s, Age: %d, Diagnosis: %s, Room Number: %d\n",
+               patientID[index],
+               patientName[index],
+               patientAge[index],
+               patientDiagnosis[index],
+               patientRoomNumber[index]);
+    } else
+    {
         printf("Patient not found.\n");
     }
 }
 
-void addPatient() {
+void addPatient(int patientID[],
+                char patientName[][50],
+                int patientAge[],
+                char patientDiagnosis[][50],
+                int patientRoomNumber[],
+                int *totalPatients)
+{
     int id;
     char name[50];
     int age;
@@ -161,94 +304,264 @@ void addPatient() {
     int diagnosisValid = 0;
     int roomNumberValid = 0;
 
-    while (idValid == 0) {
+    while (idValid == 0)
+    {
         printf("Enter in the patient Id: ");
         scanf("%d", &id);
         getchar();
         idValid = 1;
     }
 
-    while (nameValid == 0) {
+    while (nameValid == 0)
+    {
         printf("Enter in the patient name: ");
         fgets(name, 50, stdin);
         name[strcspn(name, "\n")] = 0; // Remove newline
         nameValid = 1;
     }
 
-    while (ageValid == 0) {
+    while (ageValid == 0)
+    {
         printf("Enter in the age of the patient: ");
         scanf("%d", &age);
         getchar();
         ageValid = 1;
     }
 
-    while (diagnosisValid == 0) {
+    while (diagnosisValid == 0)
+    {
         printf("Enter in the diagnosis name: ");
         fgets(diagnosis, 50, stdin);
         diagnosis[strcspn(diagnosis, "\n")] = 0;
         diagnosisValid = 1;
     }
 
-    while (roomNumberValid == 0) {
+    while (roomNumberValid == 0)
+    {
         printf("Enter in the room number: ");
         scanf("%d", &roomNumber);
         getchar();
         roomNumberValid = 1;
     }
 
-    patientID[totalPatients] = id;
-    strcpy(patientName[totalPatients], name);
-    patientAge[totalPatients] = age;
-    strcpy(patientDiagnosis[totalPatients], diagnosis);
-    patientRoomNumber[totalPatients] = roomNumber;
+    patientID[*totalPatients] = id;
+    strcpy(patientName[*totalPatients], name);
+    patientAge[*totalPatients] = age;
+    strcpy(patientDiagnosis[*totalPatients], diagnosis);
+    patientRoomNumber[*totalPatients] = roomNumber;
 
-    totalPatients++;
+    (*totalPatients)++;
 }
 
-void dischargePatient() {
-    if (totalPatients == 0) {
+void dischargePatient(int patientID[],
+                      char patientName[][50],
+                      int patientAge[],
+                      char patientDiagnosis[][50],
+                      int patientRoomNumber[],
+                      int *totalPatients)
+{
+    if (totalPatients == 0)
+    {
         printf("There are no registered patients. Please make some patients.");
         return;
     }
 
     int id;
-    int patientIndex;
+    int patientIndex = 0;
     int foundPatient = 0;
 
     printf("Please input the patient's id that is going to be discharged: \n");
     scanf("%d", &id);
 
-    while (foundPatient == 0) {
-        for (int i = 0; i < totalPatients; i++) {
-            if (patientID[i] == id) {
+    while (foundPatient == 0)
+    {
+        for (int i = 0; i < *totalPatients; i++)
+        {
+            if (patientID[i] == id)
+            {
                 foundPatient = 1;
                 patientIndex = i;
             }
         }
 
-        if (foundPatient == 0) {
+        if (foundPatient == 0)
+        {
             printf("Did not find patient. Please try again: \n");
             scanf("%d", &id);
         }
     }
 
     // Shifting down every item from the patientIndex to totalPatients
-    for (int i = patientIndex; i <= totalPatients; i++) {
+    for (int i = patientIndex; i <= *totalPatients; i++)
+    {
         patientID[i] = patientID[i + 1];
         strcpy(patientName[i], patientName[i + 1]);
         patientAge[i] = patientAge[i + 1];
         strcpy(patientDiagnosis[i], patientDiagnosis[i + 1]);
         patientRoomNumber[i] = patientRoomNumber[i + 1];
-        strcpy(doctorSchedule[i], doctorSchedule[i + 1]);
     }
-    totalPatients--;
+    (*totalPatients)--;
 
     printf("Removed patient #%d\n", id);
 }
 
-void manageDoctorSchedule() {
+void manageDoctors(int doctorSchedule[][3],
+                   char doctors[][50],
+                   int *totalDoctors)
+{
+    int input = 0;
+    while (input != 5)
+    {
+        printf("\n1. Add a doctor"
+            "\n2. View all doctors"
+            "\n3. Manage Schedule"
+            "\n4. View Doctors Schedule"
+            "\n5. Exit\n");
 
+        scanf("%d", &input);
+        getchar();
+
+        if (input < 1 || input > 5)
+        {
+            continue;
+        }
+
+        switch (input)
+        {
+            case 1:
+                addDoctor(doctors,
+                          totalDoctors);
+                break;
+            case 2:
+                viewAllDoctors(doctors,
+                               totalDoctors);
+                break;
+            case 3:
+                manageDoctorsSchedule(doctorSchedule,
+                                      *totalDoctors);
+                break;
+            case 4:
+                viewDoctorsSchedule(doctors,
+                                    doctorSchedule);
+                break;
+        }
+    }
 }
 
+void addDoctor(char doctors[][50],
+               int *totalDoctors)
+{
+    char doctorsName[50];
+
+    printf("\nPlease input the doctors name: ");
+    fgets(doctorsName, 50, stdin);
+
+    printf("\nSuccessfully added a doctor");
+    strcpy(doctors[*totalDoctors], doctorsName);
+
+    (*totalDoctors)++;
+}
+
+void viewAllDoctors(char doctors[][50],
+                    int *totalDoctors)
+{
+    printf("\nID\t|\t\tName\t\t");
+
+    for (int i = 0; i < *totalDoctors; i++)
+    {
+        printf("\n%d\t|\t\t%s",
+               i + 1,
+               doctors[i]);
+    }
+}
+
+void manageDoctorsSchedule(int doctorsSchedule[][3],
+                          int totalDoctors)
+{
+    if (totalDoctors <= 0)
+    {
+        printf("\nPlease create a doctor first");
+        return;
+    }
+
+    int timeslot = 0;
+    int weekday = 0;
+    int doctorId = -1;
+
+    printf("Please input the doctor Id: ");
+    scanf("%d", &doctorId);
+
+    while (doctorId < 1 || doctorId > totalDoctors)
+    {
+        printf("\nPlease input a valid id: ");
+        scanf("%d", &doctorId);
+    }
+
+    printf("\nPlease input the weekday (1-7) you want the doctor to work at. In a number: ");
+    scanf("%d", &weekday);
+
+    while (weekday < 1 || weekday > 7)
+    {
+        printf("\nPlease input a valid weekday: ");
+        scanf("%d", &weekday);
+    }
+
+    printf("\nPlease input the time slot you want the doctor to work at. "
+        "\n1 for morning, 2 for afternoon, and 3 for evening: ");
+    scanf("%d", &timeslot);
 
 
+    while (weekday < 1 || weekday > 3)
+    {
+        printf("Please input a valid slot: ");
+        scanf("%d", &timeslot);
+    }
+
+    doctorsSchedule[weekday - 1][timeslot - 1] = doctorId;
+    printf("Updated the schedule!");
+}
+
+void viewDoctorsSchedule(char doctors[][50],
+                         int doctorsSchedule[][3])
+{
+    for (int i = 0; i < 7; i++)
+    {
+        char dayOfTheWeek[50];
+        switch (i)
+        {
+            case 0:
+                strcpy(dayOfTheWeek, "Monday");
+                break;
+            case 1:
+                strcpy(dayOfTheWeek, "Tuesday");
+                break;
+            case 2:
+                strcpy(dayOfTheWeek, "Wednesday");
+                break;
+            case 3:
+                strcpy(dayOfTheWeek, "Thursday");
+                break;
+            case 4:
+                strcpy(dayOfTheWeek, "Friday");
+                break;
+            case 5:
+                strcpy(dayOfTheWeek, "Saturday");
+                break;
+            case 6:
+                strcpy(dayOfTheWeek, "Sunday");
+                break;
+        }
+        printf("\n%s:\n", dayOfTheWeek);
+        for (int j = 0; j < 3; j++)
+        {
+            if (doctorsSchedule[i][j] == -1)
+            {
+                printf("No doctors scheduled\t\t|");
+                continue;
+            }
+            printf("%s\t\t|",
+                doctors[doctorsSchedule[i][j] - 1]);
+        }
+    }
+    printf("\n");
+}
