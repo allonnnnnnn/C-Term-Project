@@ -488,7 +488,7 @@ void manageDoctorsSchedule(int doctorsSchedule[][3],
     int weekday = 0;
     int doctorId = -1;
 
-    printf("Please input the doctor Id: ");
+    printf("Please input the doctor Id (Or input -1 to remove a doctor from the schedule): ");
     scanf("%d", &doctorId);
 
     while (doctorId < 1 || doctorId > totalDoctors)
@@ -513,12 +513,12 @@ void manageDoctorsSchedule(int doctorsSchedule[][3],
 
     while (weekday < 1 || weekday > 3)
     {
-        printf("Please input a valid slot: ");
+        printf("\nPlease input a valid slot: ");
         scanf("%d", &timeslot);
     }
 
     doctorsSchedule[weekday - 1][timeslot - 1] = doctorId;
-    printf("Updated the schedule!");
+    printf("\nUpdated the schedule!");
 }
 
 void viewDoctorsSchedule(char doctors[][50],
