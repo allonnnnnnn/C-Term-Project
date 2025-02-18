@@ -486,39 +486,84 @@ void manageDoctorsSchedule(int doctorsSchedule[][3],
 
     int timeslot = 0;
     int weekday = 0;
-    int doctorId = -1;
+    int userInput = -1;
 
-    printf("Please input the doctor Id: ");
-    scanf("%d", &doctorId);
+    printf("Enter 1 to add a doctor to the time table or 2 to remove a doctor: ");
+    scanf("%d", &userInput);
 
-    while (doctorId < 1 || doctorId > totalDoctors)
+    while (userInput < 1 || userInput > 2)
     {
-        printf("\nPlease input a valid id: ");
+        printf("Please enter a valid input:");
+        scanf("%d", &userInput);
+    }
+
+    if (userInput == 1)
+    {
+        int doctorId = -1;
+
+        printf("Please input the doctor Id: ");
         scanf("%d", &doctorId);
-    }
 
-    printf("\nPlease input the weekday (1-7) you want the doctor to work at. In a number: ");
-    scanf("%d", &weekday);
+        while (doctorId < 1 || doctorId > totalDoctors)
+        {
+            printf("\nPlease input a valid id: ");
+            scanf("%d", &doctorId);
+        }
 
-    while (weekday < 1 || weekday > 7)
-    {
-        printf("\nPlease input a valid weekday: ");
+        printf("\nPlease input the weekday (1-7) you want the doctor to work at. In a number: ");
         scanf("%d", &weekday);
-    }
 
-    printf("\nPlease input the time slot you want the doctor to work at. "
-        "\n1 for morning, 2 for afternoon, and 3 for evening: ");
-    scanf("%d", &timeslot);
+        while (weekday < 1 || weekday > 7)
+        {
+            printf("\nPlease input a valid weekday: ");
+            scanf("%d", &weekday);
+        }
 
-
-    while (weekday < 1 || weekday > 3)
-    {
-        printf("Please input a valid slot: ");
+        printf("\nPlease input the time slot you want the doctor to work at. "
+            "\n1 for morning, 2 for afternoon, and 3 for evening: ");
         scanf("%d", &timeslot);
-    }
 
-    doctorsSchedule[weekday - 1][timeslot - 1] = doctorId;
-    printf("Updated the schedule!");
+
+        while (weekday < 1 || weekday > 3)
+        {
+            printf("Please input a valid slot: ");
+            scanf("%d", &timeslot);
+        }
+
+        doctorsSchedule[weekday - 1][timeslot - 1] = doctorId;
+        printf("Updated the schedule!");
+    } else
+    {
+        printf("\nPlease input the weekday (1-7) you want to remove a doctor from. Enter in a number: ");
+        scanf("%d", &weekday);
+
+        while (weekday < 1 || weekday > 7)
+        {
+            printf("\nPlease input a valid weekday: ");
+            scanf("%d", &weekday);
+        }
+
+        printf("\nPlease input the time slot you want to remove a doctor from. "
+            "\n1 for morning, 2 for afternoon, and 3 for evening: ");
+        scanf("%d", &timeslot);
+
+
+        while (weekday < 1 || weekday > 3)
+        {
+            printf("Please input a valid slot: ");
+            scanf("%d", &timeslot);
+        }
+
+        if (doctorsSchedule[weekday - 1][timeslot - 1] == -1)
+        {
+            printf("No doctor is appointed to this day and timeslot");
+            return;
+        } else
+        {
+            doctorsSchedule[weekday - 1][timeslot - 1] = -1;
+            printf("Timeslot cleared");
+        }
+    }
 }
 
 void viewDoctorsSchedule(char doctors[][50],
