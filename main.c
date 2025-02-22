@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 
+/**
+ * Function prototypes for patient and doctor management
+ * Includes adding, viewing, searching, and discharging patients
+ * Also includes managing doctors and their schedules
+ */
 void addPatient(int patientID[],
                 char patientName[][50],
                 int patientAge[],
@@ -59,6 +64,9 @@ void manageDoctorsSchedule(int doctorsSchedule[][3],
 void viewDoctorsSchedule(char doctors[][50],
                          int doctorsSchedule[][3]);
 
+/**
+ * Entry point of the program
+ */
 int main(void)
 {
     int patientID[50];
@@ -90,7 +98,8 @@ int main(void)
             "\n3. Search Patient by ID or Name"
             "\n4. Discharge Patient"
             "\n5. Manage Doctor Schedule"
-            "\n6. Exit\n");
+            "\n6. Exit"
+            "\nPlease input your option: ");
 
         scanf("%d", &input);
         getchar();
@@ -142,6 +151,9 @@ int main(void)
     return 0;
 }
 
+/**
+ * Displays all patients currently stored in the system
+ */
 void viewRecords(int patientID[],
                  char patientName[][50],
                  int patientAge[],
@@ -162,6 +174,9 @@ void viewRecords(int patientID[],
     printf("\n");
 }
 
+/**
+ * Allows the user to search for a patient by either ID or Name
+ */
 void searchPatient(int patientID[],
                    char patientName[][50],
                    int patientAge[],
@@ -211,6 +226,9 @@ void searchPatient(int patientID[],
     }
 }
 
+/**
+ * Searches patients by id
+ */
 void searchPatientByID(int patientID[],
                        char patientName[][50],
                        int patientAge[],
@@ -226,23 +244,20 @@ void searchPatientByID(int patientID[],
     scanf("%d", &input);
     getchar();
 
-    while (doesExist == 0)
+
+    for (int i = 0; i < totalPatients; i++)
     {
-        for (int i = 0; i < totalPatients; i++)
+        if (input == patientID[i])
         {
-            if (input == patientID[i])
-            {
-                index = i;
-                doesExist = 1;
-            }
+            index = i;
+            doesExist = 1;
         }
+    }
 
-        if (!doesExist)
-        {
-            printf("\nInvalid input. Please try again");
-
-            scanf("%d", &input);
-        }
+    if (!doesExist)
+    {
+        printf("\nPatient not found.");
+        return;
     }
 
     printf("\nPatient's name: %s"
@@ -255,6 +270,9 @@ void searchPatientByID(int patientID[],
            patientRoomNumber[index]);
 }
 
+/**
+ * Searches patients by name
+ */
 void searchPatientByName(int patientID[],
                          char patientName[][50],
                          int patientAge[],
@@ -278,7 +296,7 @@ void searchPatientByName(int patientID[],
 
     if (index != -1)
     {
-        printf("\nPatient found: \nID: %d \nName: %s \nAge: %d \nDiagnosis: %s, \nRoom Number: %d",
+        printf("\nPatient found: \nID: %d \nName: %s \nAge: %d \nDiagnosis: %s, \nRoom Number: %d\n",
                patientID[index],
                patientName[index],
                patientAge[index],
@@ -290,6 +308,10 @@ void searchPatientByName(int patientID[],
     }
 }
 
+/**
+ * Adds a patient to the system with an ID, name, age
+ * diagnosis, and room number
+ */
 void addPatient(int patientID[],
                 char patientName[][50],
                 int patientAge[],
@@ -358,6 +380,9 @@ void addPatient(int patientID[],
     (*totalPatients)++;
 }
 
+/**
+ * Removes a patient from the system by their ID
+ */
 void dischargePatient(int patientID[],
                       char patientName[][50],
                       int patientAge[],
@@ -412,6 +437,9 @@ void dischargePatient(int patientID[],
     printf("\nRemoved patient #%d", id);
 }
 
+/**
+ * Provides options to add/view doctors and manage schedules
+ */
 void manageDoctors(int doctorSchedule[][3],
                    char doctors[][50],
                    int *totalDoctors)
@@ -455,6 +483,9 @@ void manageDoctors(int doctorSchedule[][3],
     }
 }
 
+/**
+ * Adds a new doctor to the system
+ */
 void addDoctor(char doctors[][50],
                int *totalDoctors)
 {
@@ -469,6 +500,9 @@ void addDoctor(char doctors[][50],
     (*totalDoctors)++;
 }
 
+/**
+ * Views all doctors in a table-like format
+ */
 void viewAllDoctors(char doctors[][50],
                     int *totalDoctors)
 {
@@ -482,8 +516,11 @@ void viewAllDoctors(char doctors[][50],
     }
 }
 
+/**
+ * Allows modifying doctor schedules
+ */
 void manageDoctorsSchedule(int doctorsSchedule[][3],
-                          int totalDoctors)
+                           int totalDoctors)
 {
     if (totalDoctors <= 0)
     {
@@ -513,13 +550,16 @@ void manageDoctorsSchedule(int doctorsSchedule[][3],
         printf("\nPlease input the doctor Id: ");
         scanf("%d", &doctorId);
 
-        while (doctorId < 1 || doctorId > totalDoctors)
+        if (doctorId < 1 || doctorId > totalDoctors)
         {
-            printf("\nPlease input a valid id: ");
+            printf("\nNo doctor found. ");
             scanf("%d", &doctorId);
+
+            return;
         }
 
-        printf("\nPlease input the day of week (1 for Monday, 2 for Tuesday, 3 for Wednesday, etc., to 7 for Sunday) you want the doctor to work at. In a number: ");
+        printf(
+            "\nPlease input the day of week (1 for Monday, 2 for Tuesday, 3 for Wednesday, etc., to 7 for Sunday) you want the doctor to work at. In a number: ");
         scanf("%d", &weekday);
         getchar();
 
@@ -581,6 +621,9 @@ void manageDoctorsSchedule(int doctorsSchedule[][3],
     }
 }
 
+/**
+ * Displays the weekly schedule of doctors
+ */
 void viewDoctorsSchedule(char doctors[][50],
                          int doctorsSchedule[][3])
 {
@@ -620,7 +663,7 @@ void viewDoctorsSchedule(char doctors[][50],
                 continue;
             }
             printf("%s\t\t|",
-                doctors[doctorsSchedule[i][j] - 1]);
+                   doctors[doctorsSchedule[i][j] - 1]);
         }
     }
     printf("\n");
