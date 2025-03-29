@@ -5,4 +5,50 @@
 #ifndef HOSPITAL_H
 #define HOSPITAL_H
 
+#define MAX_LENGTH 200
+
+struct Patient
+{
+    int id;
+    char* name;
+    int age;
+    char* diagnosis;
+    int roomNumbers;
+};
+
+struct listNode
+{
+    struct Patient* patient;
+    struct listNode* next;
+};
+
+void addPatient(struct Patient patients[],
+                int* patientAmount);
+
+void viewRecords(const struct Patient patients[],
+                 const int* patientAmount);
+
+void searchPatient(const struct Patient patients[],
+                const int* patientAmount);
+
+void searchPatientByID(const struct Patient patients[],
+                const int* patientAmount);
+
+void searchPatientByName(const struct Patient patients[],
+                const int* patientAmount);
+
+void dischargePatient(const struct Patient patients[],
+                const int* patientAmount);
+
+void manageDoctors();
+
+void addDoctor();
+
+void viewAllDoctors();
+
+void manageDoctorsSchedule();
+
+void viewDoctorsSchedule();
+
+
 #endif //HOSPITAL_H

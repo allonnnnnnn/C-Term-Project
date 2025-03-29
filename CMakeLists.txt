@@ -3,4 +3,5 @@ project(TermProject C)
 
 set(CMAKE_C_STANDARD 23)
 
-add_executable(TermProject Phase_2/hospital.c)
+add_executable(TermProject Phase_2/hospital.c
+        Phase_2/hospital.h)
