@@ -128,29 +128,53 @@ TermProject/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\TermProject.dir\build.make CMakeFiles/TermProject.dir/build
 .PHONY : TermProject/fast
 
-main.obj: main.c.obj
-.PHONY : main.obj
+Phase_1/Hospital.obj: Phase_1/Hospital.c.obj
+.PHONY : Phase_1/Hospital.obj
 
 # target to build an object file
-main.c.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\TermProject.dir\build.make CMakeFiles/TermProject.dir/main.c.obj
-.PHONY : main.c.obj
+Phase_1/Hospital.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\TermProject.dir\build.make CMakeFiles/TermProject.dir/Phase_1/Hospital.c.obj
+.PHONY : Phase_1/Hospital.c.obj
 
-main.i: main.c.i
-.PHONY : main.i
+Phase_1/Hospital.i: Phase_1/Hospital.c.i
+.PHONY : Phase_1/Hospital.i
 
 # target to preprocess a source file
-main.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\TermProject.dir\build.make CMakeFiles/TermProject.dir/main.c.i
-.PHONY : main.c.i
+Phase_1/Hospital.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\TermProject.dir\build.make CMakeFiles/TermProject.dir/Phase_1/Hospital.c.i
+.PHONY : Phase_1/Hospital.c.i
 
-main.s: main.c.s
-.PHONY : main.s
+Phase_1/Hospital.s: Phase_1/Hospital.c.s
+.PHONY : Phase_1/Hospital.s
 
 # target to generate assembly for a file
-main.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\TermProject.dir\build.make CMakeFiles/TermProject.dir/main.c.s
-.PHONY : main.c.s
+Phase_1/Hospital.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\TermProject.dir\build.make CMakeFiles/TermProject.dir/Phase_1/Hospital.c.s
+.PHONY : Phase_1/Hospital.c.s
+
+Phase_2/main.obj: Phase_2/main.c.obj
+.PHONY : Phase_2/main.obj
+
+# target to build an object file
+Phase_2/main.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\TermProject.dir\build.make CMakeFiles/TermProject.dir/Phase_2/main.c.obj
+.PHONY : Phase_2/main.c.obj
+
+Phase_2/main.i: Phase_2/main.c.i
+.PHONY : Phase_2/main.i
+
+# target to preprocess a source file
+Phase_2/main.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\TermProject.dir\build.make CMakeFiles/TermProject.dir/Phase_2/main.c.i
+.PHONY : Phase_2/main.c.i
+
+Phase_2/main.s: Phase_2/main.c.s
+.PHONY : Phase_2/main.s
+
+# target to generate assembly for a file
+Phase_2/main.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\TermProject.dir\build.make CMakeFiles/TermProject.dir/Phase_2/main.c.s
+.PHONY : Phase_2/main.c.s
 
 # Help Target
 help:
@@ -161,9 +185,12 @@ help:
 	@echo ... edit_cache
 	@echo ... rebuild_cache
 	@echo ... TermProject
-	@echo ... main.obj
-	@echo ... main.i
-	@echo ... main.s
+	@echo ... Phase_1/Hospital.obj
+	@echo ... Phase_1/Hospital.i
+	@echo ... Phase_1/Hospital.s
+	@echo ... Phase_2/main.obj
+	@echo ... Phase_2/main.i
+	@echo ... Phase_2/main.s
 .PHONY : help
 
 

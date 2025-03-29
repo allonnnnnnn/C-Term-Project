@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/TermProject.dir/main.c.obj"
-  "CMakeFiles/TermProject.dir/main.c.obj.d"
+  "CMakeFiles/TermProject.dir/Phase_1/Hospital.c.obj"
+  "CMakeFiles/TermProject.dir/Phase_1/Hospital.c.obj.d"
+  "CMakeFiles/TermProject.dir/Phase_2/main.c.obj"
+  "CMakeFiles/TermProject.dir/Phase_2/main.c.obj.d"
   "TermProject.exe"
   "TermProject.exe.manifest"
   "TermProject.pdb"
