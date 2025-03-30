@@ -10,22 +10,16 @@
 
 int main()
 {
-    int maxPatients = 10;
-    struct Patient** patients = malloc(maxPatients * sizeof(struct Patient*));
-    int patientAmount = 0;
+    struct LinkedList patientList = {NULL, 0};
     int input = 1;
 
-    if (patients == NULL)
-    {
-        printf("Could not allocate memory for patients");
-        free(patients);
-        return 1;
-    }
+    //Load from save file here
 
     while (input != 6)
     {
-        printf("\n1. Add Patient Record\n"
-            "2. View All Patients\n"
+        printf("\nMAIN MENU\n"
+            "1. Add Patient Record\n"
+            "2. Reporting and Analytics Menu\n"
             "3. Search Patient by ID or Name\n"
             "4. Discharge Patient\n"
             "5. Manage Doctor Schedule\n"
@@ -43,39 +37,42 @@ int main()
         switch (input)
         {
         case 1:
-            addPatient(&patients, &patientAmount, &maxPatients);
+            addPatient(&patientList);
             break;
         case 2:
+            ReportsAndAnalyticsMenu(&patientList);
             break;
         case 3:
             break;
         case 4:
+            dischargePatient(&patientList);
             break;
         case 5:
             break;
         }
     }
+
+    //TODO: free up the nodes within the linkedlist
 }
 
-int validateId(struct Patient** patients,
-               int patientAmount,
+int validateId(const struct LinkedList* patientList,
                int id)
 {
-    for (int i = 0; i < patientAmount; i++)
+    struct listNode* current = patientList->head;
+    while (current != NULL)
     {
-        printf("%s\n", patients[i]->name);
-        if (patients[i]->id == id)
+        if (current->patient->id == id)
         {
             return 1;
         }
+
+        current = current->next;
     }
 
     return 0;
 }
 
-void addPatient(struct Patient*** patients,
-                int* patientAmount,
-                int* maxPatientAmount)
+void addPatient(struct LinkedList* patientList)
 {
     int id;
     char name[50];
@@ -95,7 +92,7 @@ void addPatient(struct Patient*** patients,
         scanf("%d", &id);
         getchar();
 
-        if (id < 0 || validateId(*patients, *patientAmount, id))
+        if (id < 0 || validateId(patientList, id))
         {
             printf("\nInvalid input or Id is taken. Please try again\n");
             continue;
@@ -164,32 +161,149 @@ void addPatient(struct Patient*** patients,
         roomNumberValid = 1;
     }
 
-    (*patients)[*patientAmount] = malloc(sizeof(struct Patient));
+    struct listNode* createdNode = malloc(sizeof(struct listNode));
 
-    if (patients[*patientAmount] == NULL) {
-        printf("Memory allocation failed\n");
+    if (createdNode == NULL)
+    {
+        printf("Could not allocate memory to create a node");
         return;
     }
 
-    if (*maxPatientAmount <= *patientAmount)
+    createdNode->next = NULL;
+    createdNode->patient = malloc(sizeof(struct Patient));
+    if (createdNode->patient == NULL)
     {
-        printf("allocated");
-
-        struct Patient** temp = realloc(*patients, sizeof(struct Patient*) * (*patientAmount + 10));
-        if (temp == NULL)
-        {
-            printf("Could not allocate more memory");
-            return;
-        }
-        maxPatientAmount += 10;
-        *patients = temp;
+        printf("Could not allocate memory for a new patient");
+        return;
     }
 
-    (*patients)[*patientAmount]->id = id;
-    (*patients)[*patientAmount]->age = age;
-    strcpy((*patients)[*patientAmount]->diagnosis, diagnosis);
-    strcpy((*patients)[*patientAmount]->name, name);
-    (*patients)[*patientAmount]->roomNumbers = roomNumber;
+    createdNode->patient->id = id;
+    createdNode->patient->age = age;
+    createdNode->patient->roomNumbers = roomNumber;
+    strcpy(createdNode->patient->name, name);
+    strcpy(createdNode->patient->diagnosis, diagnosis);
 
-    (*patientAmount)++;
+    if (patientList->head == NULL)
+    {
+        patientList->head = createdNode;
+        patientList->nodeAmount++;
+        return;
+    }
+
+    struct listNode* current = patientList->head;
+
+    while (current->next != NULL)
+    {
+        // printf("%s\n", current->patient->name);
+        current = current->next;
+    }
+
+    current->next = createdNode;
 }
+
+void dischargePatient(struct LinkedList* patientList)
+{
+    if (patientList->nodeAmount == 0)
+    {
+        printf("\nPlease register a patient first.\n");
+        return;
+    }
+
+    int id = 0;
+
+    printf("\nPlease input the patient's Id to be discharged:\n");
+    scanf("%d", &id);
+
+    struct listNode* prevNode = NULL;
+    struct listNode* currentNode = patientList->head;
+    while (currentNode != NULL)
+    {
+        if (currentNode->patient->id == id)
+        {
+            if (prevNode == NULL)
+            {
+                patientList->head = currentNode->next;
+            } else
+            {
+                prevNode->next = currentNode->next;
+            }
+
+            patientList->nodeAmount--;
+            printf("Successfully delete patient #%d\n", id);
+            return;
+        }
+
+        prevNode = currentNode;
+        currentNode = currentNode->next;
+    }
+
+    printf("No patient with that Id was found\n");
+
+}
+
+void ReportsAndAnalyticsMenu(const struct LinkedList* patientList)
+{
+    int input = 0;
+
+    while (input != 6)
+    {
+        printf("\nREPORTING AND ANALYTICS\n"
+            "1. View All Patients\n"
+            "2. Patients Discharged by Day, Week, And Month\n"
+            "3. Patients Discharged on a Specific Day\n"
+            "4. Discharge Patient Statistics\n"
+            "5. Room Usage Statistics\n"
+            "6. Go back\n"
+            "Please input your option:\n");
+
+        scanf("%d", &input);
+
+        switch (input)
+        {
+        case 1:
+            viewAllPatients(patientList);
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        case 4:
+            break;
+        case 5:
+            break;
+        case 6:
+            break;
+        }
+    }
+}
+
+void viewAllPatients(const struct LinkedList* patientList)
+{
+    if (patientList->nodeAmount == 0)
+    {
+        printf("\nPlease register a patient first\n");
+        return;
+    }
+
+    printf("\n");
+
+    struct listNode* currentNode = patientList->head;
+    while (currentNode != NULL)
+    {
+        struct Patient* nodePatient = currentNode->patient;
+        printf("Id: %d | Name: %s | Age: %d | Diagnosis: %s | Room Number: %d\n",
+               nodePatient->id, nodePatient->name, nodePatient->age, nodePatient->diagnosis, nodePatient->roomNumbers);
+
+        currentNode = currentNode->next;
+    }
+
+    printf("\n");
+}
+
+void searchPatient(struct LinkedList* patientList);
+
+void searchPatientByID(struct LinkedList* patientList);
+
+void searchPatientByName(struct LinkedList* patientList);
+
+void dischargePatient(struct LinkedList* patientList);

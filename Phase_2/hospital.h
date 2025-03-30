@@ -22,24 +22,25 @@ struct listNode
     struct listNode* next;
 };
 
-void addPatient(struct Patient ***patients,
-                int* patientAmount,
-                int* maxPatientAmount);
+struct LinkedList
+{
+    struct listNode* head;
+    int nodeAmount;
+};
 
-void viewRecords(const struct Patient patients[],
-                 const int* patientAmount);
+void addPatient(struct LinkedList* patientList);
 
-void searchPatient(const struct Patient patients[],
-                   const int* patientAmount);
+void ReportsAndAnalyticsMenu(const struct LinkedList* patientList);
 
-void searchPatientByID(const struct Patient patients[],
-                       const int* patientAmount);
+void viewAllPatients(const struct LinkedList* patientList);
 
-void searchPatientByName(const struct Patient patients[],
-                         const int* patientAmount);
+void searchPatient(struct LinkedList* patientList);
 
-void dischargePatient(const struct Patient patients[],
-                      const int* patientAmount);
+void searchPatientByID(struct LinkedList* patientList);
+
+void searchPatientByName(struct LinkedList* patientList);
+
+void dischargePatient(struct LinkedList* patientList);
 
 void manageDoctors();
 
