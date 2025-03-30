@@ -34,7 +34,7 @@ void ReportsAndAnalyticsMenu(const struct LinkedList* patientList);
 
 void viewAllPatients(const struct LinkedList* patientList);
 
-void searchPatient(struct LinkedList* patientList);
+void searchPatientMenu(struct LinkedList* patientList);
 
 void searchPatientByID(struct LinkedList* patientList);
 

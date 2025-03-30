@@ -20,7 +20,7 @@ int main()
         printf("\nMAIN MENU\n"
             "1. Add Patient Record\n"
             "2. Reporting and Analytics Menu\n"
-            "3. Search Patient by ID or Name\n"
+            "3. Search Patient Menu\n"
             "4. Discharge Patient\n"
             "5. Manage Doctor Schedule\n"
             "6. Exit\n"
@@ -43,6 +43,7 @@ int main()
             ReportsAndAnalyticsMenu(&patientList);
             break;
         case 3:
+            searchPatientMenu(&patientList);
             break;
         case 4:
             dischargePatient(&patientList);
@@ -186,6 +187,7 @@ void addPatient(struct LinkedList* patientList)
     struct listNode* current = patientList->head;
     struct listNode* prevNode = NULL;
 
+    //If no head, we make the head the created node
     if (patientList->head == NULL)
     {
         patientList->head = createdNode;
@@ -195,6 +197,7 @@ void addPatient(struct LinkedList* patientList)
 
     while (current != NULL)
     {
+        //Sort Id by ascending when inserting them into the linkedlist
         if (id < current->patient->id)
         {
             prevNode->next = createdNode;
@@ -207,7 +210,10 @@ void addPatient(struct LinkedList* patientList)
         current = current->next;
     }
 
+    //Insert created node to the end of linkedlist when it's the biggest
+    //Id within the patient's list
     prevNode->next = createdNode;
+    patientList->nodeAmount++;
 }
 
 void dischargePatient(struct LinkedList* patientList)
@@ -227,12 +233,15 @@ void dischargePatient(struct LinkedList* patientList)
     struct listNode* currentNode = patientList->head;
     while (currentNode != NULL)
     {
+        //Check for matching Id's
         if (currentNode->patient->id == id)
         {
+            //This is to check if it is the head node to be deleted
             if (prevNode == NULL)
             {
                 patientList->head = currentNode->next;
             }
+            //Every other node that isn't the head node
             else
             {
                 prevNode->next = currentNode->next;
@@ -309,10 +318,91 @@ void viewAllPatients(const struct LinkedList* patientList)
     printf("\n");
 }
 
-void searchPatient(struct LinkedList* patientList);
+void searchPatientMenu(struct LinkedList* patientList)
+{
+    int input = 0;
 
-void searchPatientByID(struct LinkedList* patientList);
+    while (input != 3)
+    {
+        printf("\nSEARCH PATIENT MENU\n"
+            "1. Search by Id\n"
+            "2. Search by Name\n"
+            "3. Go back\n"
+            "Please input your option:\n");
 
-void searchPatientByName(struct LinkedList* patientList);
+        scanf("%d", &input);
 
-void dischargePatient(struct LinkedList* patientList);
+        switch (input)
+        {
+        case 1:
+            searchPatientByID(patientList);
+            break;
+        case 2:
+            searchPatientByName(patientList);
+            break;
+        }
+    }
+}
+
+void searchPatientByID(struct LinkedList* patientList)
+{
+    int id = -1;
+    struct listNode* currentNode;
+
+    while (id < 0)
+    {
+        printf("\nPlease input the Patient's Id:\n");
+        scanf("%d", &id);
+
+        if (id < 0)
+        {
+            printf("Please input a valid Id");
+        }
+    }
+
+    currentNode = patientList->head;
+    while (currentNode != NULL)
+    {
+        if (id == currentNode->patient->id)
+        {
+            printf("Id: %d | Name: %s | Age: %d | Diagnosis: %s | Room Number: %d\n",
+                   currentNode->patient->id, currentNode->patient->name, currentNode->patient->age,
+                   currentNode->patient->diagnosis, currentNode->patient->roomNumbers);
+            return;
+        }
+    }
+
+    printf("Patient was not found");
+}
+
+void searchPatientByName(struct LinkedList* patientList)
+{
+    char name[50];
+    int patientFound = 0;
+    struct listNode* currentNode;
+
+    printf("\nEnter Patient Name:\n");
+
+    getchar();
+    fgets(name, 50, stdin);
+    name[strcspn(name, "\n")] = 0;
+
+    currentNode = patientList->head;
+    while (currentNode != NULL)
+    {
+        if (strcmp(name, currentNode->patient->name) == 0)
+        {
+            printf("Id: %d | Name: %s | Age: %d | Diagnosis: %s | Room Number: %d\n",
+                   currentNode->patient->id, currentNode->patient->name, currentNode->patient->age,
+                   currentNode->patient->diagnosis, currentNode->patient->roomNumbers);
+            patientFound = 1;
+        }
+
+        currentNode = currentNode->next;
+    }
+
+    if (!patientFound)
+    {
+        printf("No patients were found\n");
+    }
+}
