@@ -183,6 +183,9 @@ void addPatient(struct LinkedList* patientList)
     strcpy(createdNode->patient->name, name);
     strcpy(createdNode->patient->diagnosis, diagnosis);
 
+    struct listNode* current = patientList->head;
+    struct listNode* prevNode = NULL;
+
     if (patientList->head == NULL)
     {
         patientList->head = createdNode;
@@ -190,15 +193,21 @@ void addPatient(struct LinkedList* patientList)
         return;
     }
 
-    struct listNode* current = patientList->head;
-
-    while (current->next != NULL)
+    while (current != NULL)
     {
-        // printf("%s\n", current->patient->name);
+        if (id < current->patient->id)
+        {
+            prevNode->next = createdNode;
+            createdNode->next = current;
+            patientList->nodeAmount++;
+            return;
+        }
+
+        prevNode = current;
         current = current->next;
     }
 
-    current->next = createdNode;
+    prevNode->next = createdNode;
 }
 
 void dischargePatient(struct LinkedList* patientList)
@@ -223,7 +232,8 @@ void dischargePatient(struct LinkedList* patientList)
             if (prevNode == NULL)
             {
                 patientList->head = currentNode->next;
-            } else
+            }
+            else
             {
                 prevNode->next = currentNode->next;
             }
@@ -238,7 +248,6 @@ void dischargePatient(struct LinkedList* patientList)
     }
 
     printf("No patient with that Id was found\n");
-
 }
 
 void ReportsAndAnalyticsMenu(const struct LinkedList* patientList)
