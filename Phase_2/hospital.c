@@ -10,7 +10,8 @@
 
 int main()
 {
-    struct Patient* patients = malloc(10 * sizeof(struct Patient));
+    int maxPatients = 10;
+    struct Patient** patients = malloc(maxPatients * sizeof(struct Patient*));
     int patientAmount = 0;
     int input = 1;
 
@@ -42,7 +43,7 @@ int main()
         switch (input)
         {
         case 1:
-            addPatient(patients, &patientAmount);
+            addPatient(&patients, &patientAmount, &maxPatients);
             break;
         case 2:
             break;
@@ -56,13 +57,14 @@ int main()
     }
 }
 
-int validateId(const struct Patient patients[],
+int validateId(struct Patient** patients,
                int patientAmount,
                int id)
 {
     for (int i = 0; i < patientAmount; i++)
     {
-        if (patients[i].id == id)
+        printf("%s\n", patients[i]->name);
+        if (patients[i]->id == id)
         {
             return 1;
         }
@@ -71,8 +73,9 @@ int validateId(const struct Patient patients[],
     return 0;
 }
 
-void addPatient(struct Patient patients[],
-                int* patientAmount)
+void addPatient(struct Patient*** patients,
+                int* patientAmount,
+                int* maxPatientAmount)
 {
     int id;
     char name[50];
@@ -92,7 +95,7 @@ void addPatient(struct Patient patients[],
         scanf("%d", &id);
         getchar();
 
-        if (id < 0 || validateId(patients, *patientAmount, id))
+        if (id < 0 || validateId(*patients, *patientAmount, id))
         {
             printf("\nInvalid input or Id is taken. Please try again\n");
             continue;
@@ -161,21 +164,32 @@ void addPatient(struct Patient patients[],
         roomNumberValid = 1;
     }
 
-    struct Patient createdPatient =
-    {
-        id,
-        name,
-        age,
-        diagnosis,
-        roomNumber
-    };
+    (*patients)[*patientAmount] = malloc(sizeof(struct Patient));
 
-    patients[*patientAmount] = createdPatient;
-    *patientAmount++;
-
-    //TODO: realloc more memory if we ran out of space within the array but my ass is lazy
-    if (sizeof(patients) / sizeof(struct Patient) == patientAmount)
-    {
-
+    if (patients[*patientAmount] == NULL) {
+        printf("Memory allocation failed\n");
+        return;
     }
+
+    if (*maxPatientAmount <= *patientAmount)
+    {
+        printf("allocated");
+
+        struct Patient** temp = realloc(*patients, sizeof(struct Patient*) * (*patientAmount + 10));
+        if (temp == NULL)
+        {
+            printf("Could not allocate more memory");
+            return;
+        }
+        maxPatientAmount += 10;
+        *patients = temp;
+    }
+
+    (*patients)[*patientAmount]->id = id;
+    (*patients)[*patientAmount]->age = age;
+    strcpy((*patients)[*patientAmount]->diagnosis, diagnosis);
+    strcpy((*patients)[*patientAmount]->name, name);
+    (*patients)[*patientAmount]->roomNumbers = roomNumber;
+
+    (*patientAmount)++;
 }

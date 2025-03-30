@@ -10,9 +10,9 @@
 struct Patient
 {
     int id;
-    char* name;
+    char name[MAX_LENGTH];
     int age;
-    char* diagnosis;
+    char diagnosis[MAX_LENGTH];
     int roomNumbers;
 };
 
@@ -22,23 +22,24 @@ struct listNode
     struct listNode* next;
 };
 
-void addPatient(struct Patient patients[],
-                int* patientAmount);
+void addPatient(struct Patient ***patients,
+                int* patientAmount,
+                int* maxPatientAmount);
 
 void viewRecords(const struct Patient patients[],
                  const int* patientAmount);
 
 void searchPatient(const struct Patient patients[],
-                const int* patientAmount);
+                   const int* patientAmount);
 
 void searchPatientByID(const struct Patient patients[],
-                const int* patientAmount);
+                       const int* patientAmount);
 
 void searchPatientByName(const struct Patient patients[],
-                const int* patientAmount);
+                         const int* patientAmount);
 
 void dischargePatient(const struct Patient patients[],
-                const int* patientAmount);
+                      const int* patientAmount);
 
 void manageDoctors();
 
