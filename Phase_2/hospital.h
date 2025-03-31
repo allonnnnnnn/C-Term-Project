@@ -37,6 +37,12 @@ void createPatientToList(struct LinkedList* patientList,
                          char* diagnosis,
                          int roomNumber);
 
+void writePatientToSaveFile(int id,
+                            char* name,
+                            int age,
+                            char* diagnosis,
+                            int roomNumber);
+
 void loadSaveFile(struct LinkedList* patientList);
 
 void ReportsAndAnalyticsMenu(const struct LinkedList* patientList);

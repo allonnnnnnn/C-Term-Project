@@ -54,7 +54,7 @@ int main()
         }
     }
 
-    //TODO: free up the nodes within the linkedlist
+    //TODO: free up all the nodes' memory within the linkedlist, for you lil arshy
 }
 
 void loadSaveFile(struct LinkedList* patientList)
@@ -86,8 +86,36 @@ void loadSaveFile(struct LinkedList* patientList)
             fscanf(fptr, "%d %s %d %s %d",
                    &id, name, &age, diagnosis, &roomNumber);
         }
+
+        printf("Successfully loaded data\n");
         fclose(fptr);
     }
+}
+
+void writePatientToSaveFile(int id,
+                            char name[50],
+                            int age,
+                            char diagnosis[50],
+                            int roomNumber)
+{
+    FILE *fptr = fopen("saveFile.txt", "a");
+
+    for (int i = 0; i < 50; i++)
+    {
+        if (name[i] == ' ')
+        {
+            name[i] = '_';
+        }
+
+        if (diagnosis[i] == ' ')
+        {
+            diagnosis[i] = '_';
+        }
+    }
+
+    fprintf(fptr, "%d %s %d %s %d\n", id, name, age, diagnosis, roomNumber);
+
+    fclose(fptr);
 }
 
 int validateId(const struct LinkedList* patientList,
@@ -197,6 +225,7 @@ void addPatient(struct LinkedList* patientList)
     }
 
     createPatientToList(patientList, id, name, age, diagnosis, roomNumber);
+    writePatientToSaveFile(id, name, age, diagnosis, roomNumber);
 }
 
 void createPatientToList(struct LinkedList* patientList,
@@ -220,6 +249,20 @@ void createPatientToList(struct LinkedList* patientList,
     {
         printf("Could not allocate memory for a new patient");
         return;
+    }
+
+    //To get rid of the underscores within the text
+    for (int i = 0; i < 50; i++)
+    {
+        if (name[i] == '_')
+        {
+            name[i] = ' ';
+        }
+
+        if (diagnosis[i] == '_')
+        {
+            diagnosis[i] = ' ';
+        }
     }
 
     createdNode->patient->id = id;
