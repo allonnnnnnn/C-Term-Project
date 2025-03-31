@@ -13,11 +13,12 @@ int main()
     struct LinkedList patientList = {NULL, 0};
     int input = 1;
 
-    //Load from save file here
+    //Loading previous saved patients
+    loadSaveFile(&patientList);
 
     while (input != 6)
     {
-        printf("\nMAIN MENU\n"
+        printf("MAIN MENU\n"
             "1. Add Patient Record\n"
             "2. Reporting and Analytics Menu\n"
             "3. Search Patient Menu\n"
@@ -54,6 +55,39 @@ int main()
     }
 
     //TODO: free up the nodes within the linkedlist
+}
+
+void loadSaveFile(struct LinkedList* patientList)
+{
+    FILE* fptr;
+
+    fptr = fopen("saveFile.txt", "r");
+
+    if (fptr == NULL)
+    {
+        fopen("saveFile.txt", "w");
+    }
+    else
+    {
+        int id;
+        char name[50];
+        int age;
+        char diagnosis[50];
+        int roomNumber;
+
+        fscanf(fptr, "%d %s %d %s %d",
+               &id, name, &age, diagnosis, &roomNumber);
+
+
+        while (!feof(fptr))
+        {
+            createPatientToList(patientList, id, name, age, diagnosis, roomNumber);
+
+            fscanf(fptr, "%d %s %d %s %d",
+                   &id, name, &age, diagnosis, &roomNumber);
+        }
+        fclose(fptr);
+    }
 }
 
 int validateId(const struct LinkedList* patientList,
@@ -162,6 +196,16 @@ void addPatient(struct LinkedList* patientList)
         roomNumberValid = 1;
     }
 
+    createPatientToList(patientList, id, name, age, diagnosis, roomNumber);
+}
+
+void createPatientToList(struct LinkedList* patientList,
+                         int id,
+                         char* name,
+                         int age,
+                         char* diagnosis,
+                         int roomNumber)
+{
     struct listNode* createdNode = malloc(sizeof(struct listNode));
 
     if (createdNode == NULL)
@@ -215,6 +259,7 @@ void addPatient(struct LinkedList* patientList)
     prevNode->next = createdNode;
     patientList->nodeAmount++;
 }
+
 
 void dischargePatient(struct LinkedList* patientList)
 {
@@ -324,7 +369,7 @@ void searchPatientMenu(struct LinkedList* patientList)
 
     while (input != 3)
     {
-        printf("\nSEARCH PATIENT MENU\n"
+        printf("SEARCH PATIENT MENU\n"
             "1. Search by Id\n"
             "2. Search by Name\n"
             "3. Go back\n"

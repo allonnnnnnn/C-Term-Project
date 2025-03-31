@@ -30,6 +30,15 @@ struct LinkedList
 
 void addPatient(struct LinkedList* patientList);
 
+void createPatientToList(struct LinkedList* patientList,
+                         int id,
+                         char* name,
+                         int age,
+                         char* diagnosis,
+                         int roomNumber);
+
+void loadSaveFile(struct LinkedList* patientList);
+
 void ReportsAndAnalyticsMenu(const struct LinkedList* patientList);
 
 void viewAllPatients(const struct LinkedList* patientList);
