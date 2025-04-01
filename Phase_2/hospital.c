@@ -5,8 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include "hospital.h"
+
+#define CURRENT_YEAR 2025
 
 int main()
 {
@@ -98,7 +99,7 @@ void writePatientToSaveFile(int id,
                             char diagnosis[50],
                             int roomNumber)
 {
-    FILE *fptr = fopen("saveFile.txt", "a");
+    FILE* fptr = fopen("saveFile.txt", "a");
 
     for (int i = 0; i < 50; i++)
     {
@@ -251,7 +252,7 @@ void createPatientToList(struct LinkedList* patientList,
         return;
     }
 
-    //To get rid of the underscores within the text
+    //To get rid of the underscores within the text when loading them into patientList
     for (int i = 0; i < 50; i++)
     {
         if (name[i] == '_')
@@ -270,6 +271,7 @@ void createPatientToList(struct LinkedList* patientList,
     createdNode->patient->roomNumbers = roomNumber;
     strcpy(createdNode->patient->name, name);
     strcpy(createdNode->patient->diagnosis, diagnosis);
+    createdNode->patient->dischargeDate = NULL;
 
     struct listNode* current = patientList->head;
     struct listNode* prevNode = NULL;
@@ -313,9 +315,39 @@ void dischargePatient(struct LinkedList* patientList)
     }
 
     int id = 0;
+    int dateInitializationStatus = 0;
+    struct Date* dischargeDate = malloc(sizeof(struct Date));
+    int year = 0;
+    int month = 0;
+    int day = 0;
+
+    if (dischargeDate == NULL)
+    {
+        printf("Could not allocated memory for date");
+        return;
+    }
 
     printf("\nPlease input the patient's Id to be discharged:\n");
     scanf("%d", &id);
+
+    while (dateInitializationStatus == 0)
+    {
+        printf("Please input the day the patient was discharged:\n");
+        scanf("%d", &day);
+
+        printf("Please input the month the patient was discharged:\n");
+        scanf("%d", &month);
+
+        printf("Please input the year the patient was discharged:\n");
+        scanf("%d", &year);
+
+        dateInitializationStatus = initializeDate(dischargeDate, day, month, year);
+
+        if (dateInitializationStatus == 0)
+        {
+            printf("Please try again\n");
+        }
+    }
 
     struct listNode* prevNode = NULL;
     struct listNode* currentNode = patientList->head;
@@ -324,19 +356,9 @@ void dischargePatient(struct LinkedList* patientList)
         //Check for matching Id's
         if (currentNode->patient->id == id)
         {
-            //This is to check if it is the head node to be deleted
-            if (prevNode == NULL)
-            {
-                patientList->head = currentNode->next;
-            }
-            //Every other node that isn't the head node
-            else
-            {
-                prevNode->next = currentNode->next;
-            }
+            currentNode->patient->dischargeDate = dischargeDate;
 
-            patientList->nodeAmount--;
-            printf("Successfully delete patient #%d\n", id);
+            printf("Successfully discharged patient #%d\n", id);
             return;
         }
 
@@ -397,9 +419,15 @@ void viewAllPatients(const struct LinkedList* patientList)
     while (currentNode != NULL)
     {
         struct Patient* nodePatient = currentNode->patient;
-        printf("Id: %d | Name: %s | Age: %d | Diagnosis: %s | Room Number: %d\n",
-               nodePatient->id, nodePatient->name, nodePatient->age, nodePatient->diagnosis, nodePatient->roomNumbers);
+        char dischargedDateString[50];
 
+        dateToString(nodePatient->dischargeDate, dischargedDateString);
+
+        printf("Id: %d | Name: %s | Age: %d | Diagnosis: %s | Room Number: %d | Date discharged: %s\n",
+               nodePatient->id, nodePatient->name, nodePatient->age, nodePatient->diagnosis, nodePatient->roomNumbers,
+               dischargedDateString);
+
+        strcpy(dischargedDateString, "");
         currentNode = currentNode->next;
     }
 
@@ -435,7 +463,7 @@ void searchPatientMenu(struct LinkedList* patientList)
 void searchPatientByID(struct LinkedList* patientList)
 {
     int id = -1;
-    struct listNode* currentNode;
+    const struct listNode* currentNode;
 
     while (id < 0)
     {
@@ -449,6 +477,7 @@ void searchPatientByID(struct LinkedList* patientList)
     }
 
     currentNode = patientList->head;
+
     while (currentNode != NULL)
     {
         if (id == currentNode->patient->id)
@@ -493,4 +522,73 @@ void searchPatientByName(struct LinkedList* patientList)
     {
         printf("No patients were found\n");
     }
+}
+
+//Bunch of date functions below
+void dateToString(const struct Date* date,
+                  char* string)
+{
+    if (date == NULL)
+    {
+        return;
+    }
+
+    char dayString[10];
+    char monthString[10];
+    char yearString[10];
+
+    sprintf(dayString, "%d", date->day);
+    sprintf(monthString, "%d", date->month);
+    sprintf(yearString, "%d", date->year);
+
+    strcat(string, dayString);
+    strcat(string, "/");
+    strcat(string, monthString);
+    strcat(string, "/");
+    strcat(string, yearString);
+}
+
+int initializeDate(struct Date* date,
+                   int day,
+                   int month,
+                   int year)
+{
+    if (!validateDate(day, month, year))
+    {
+        return 0;
+    }
+
+    date->day = day;
+    date->month = month;
+    date->year = year;
+
+    return 1;
+}
+
+int validateDate(int day,
+                 int month,
+                 int year)
+{
+    if (year < 1900 || year > CURRENT_YEAR)
+    {
+        printf("Invalid Year\n");
+        return 0;
+    }
+
+    if (month < 1 || month > 12)
+    {
+        printf("Invalid Month\n");
+        return 0;
+    }
+
+    // Days in each month
+    int daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+    if (day < 1 || day > daysInMonth[month - 1])
+    {
+        printf("Invalid Day\n");
+        return 0;
+    }
+
+    return 1;
 }

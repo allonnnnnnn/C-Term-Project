@@ -14,6 +14,14 @@ struct Patient
     int age;
     char diagnosis[MAX_LENGTH];
     int roomNumbers;
+    struct Date* dischargeDate;
+};
+
+struct Date
+{
+    int day;
+    int month;
+    int year;
 };
 
 struct listNode
@@ -42,6 +50,18 @@ void writePatientToSaveFile(int id,
                             int age,
                             char* diagnosis,
                             int roomNumber);
+
+int validateDate(int day,
+                 int month,
+                 int year);
+
+int initializeDate(struct Date* date,
+                   int day,
+                   int month,
+                   int year);
+
+void dateToString(const struct Date* date,
+                  char* string);
 
 void loadSaveFile(struct LinkedList* patientList);
 
