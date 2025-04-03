@@ -19,7 +19,7 @@ int main()
 
     while (input != 6)
     {
-        printf("MAIN MENU\n"
+        printf("\nMAIN MENU\n"
             "1. Add Patient Record\n"
             "2. Reporting and Analytics Menu\n"
             "3. Search Patient Menu\n"
@@ -52,10 +52,45 @@ int main()
             break;
         case 5:
             break;
+        case 6:
+            writeAllPatientsToSaveFile(&patientList);
+            break;
         }
     }
 
     //TODO: free up all the nodes' memory within the linkedlist, for you lil arshy
+}
+
+void replaceSpacesWithUnderscores(char* string)
+{
+    for (int i = 0; i < strlen(string); i++)
+    {
+        if (string[i] == 0)
+        {
+            break;
+        }
+
+        if (string[i] == ' ')
+        {
+            string[i] = '_';
+        }
+    }
+}
+
+void replaceUnderscoresWithSpaces(char* string)
+{
+    for (int i = 0; i < strlen(string); i++)
+    {
+        if (string[i] == 0)
+        {
+            break;
+        }
+
+        if (string[i] == '_')
+        {
+            string[i] = ' ';
+        }
+    }
 }
 
 void loadSaveFile(struct LinkedList* patientList)
@@ -75,17 +110,24 @@ void loadSaveFile(struct LinkedList* patientList)
         int age;
         char diagnosis[50];
         int roomNumber;
+        char dateString[10];
 
-        fscanf(fptr, "%d %s %d %s %d",
-               &id, name, &age, diagnosis, &roomNumber);
-
+        fscanf(fptr, "%d %s %d %s %d %s",
+               &id, name, &age, diagnosis, &roomNumber, dateString);
 
         while (!feof(fptr))
         {
-            createPatientToList(patientList, id, name, age, diagnosis, roomNumber);
+            struct Date* dischargedDate = NULL;
 
-            fscanf(fptr, "%d %s %d %s %d",
-                   &id, name, &age, diagnosis, &roomNumber);
+            if (strcmp(dateString, "null") != 0)
+            {
+                parseDate(&dischargedDate, dateString);
+            }
+
+            createPatientToList(patientList, id, name, age, diagnosis, roomNumber, dischargedDate);
+
+            fscanf(fptr, "%d %s %d %s %d %s",
+                   &id, name, &age, diagnosis, &roomNumber, dateString);
         }
 
         printf("Successfully loaded data\n");
@@ -101,20 +143,39 @@ void writePatientToSaveFile(int id,
 {
     FILE* fptr = fopen("saveFile.txt", "a");
 
-    for (int i = 0; i < 50; i++)
+    replaceSpacesWithUnderscores(name);
+    replaceSpacesWithUnderscores(diagnosis);
+
+    fprintf(fptr, "%d %s %d %s %d %s\n", id, name, age, diagnosis, roomNumber, "null");
+
+    fclose(fptr);
+}
+
+void writeAllPatientsToSaveFile(const struct LinkedList* patientList)
+{
+    FILE* fptr = fopen("saveFile.txt", "w");
+    struct listNode* currentNode = patientList->head;
+
+    while (currentNode != NULL)
     {
-        if (name[i] == ' ')
-        {
-            name[i] = '_';
-        }
+        char dateString[10] = "null";
+        char name[50];
+        char diagnosis[50];
 
-        if (diagnosis[i] == ' ')
-        {
-            diagnosis[i] = '_';
-        }
+        dateToString(currentNode->patient->dischargeDate, dateString);
+
+        strcpy(name, currentNode->patient->name);
+        strcpy(diagnosis, currentNode->patient->diagnosis);
+        replaceSpacesWithUnderscores(name);
+        replaceSpacesWithUnderscores(diagnosis);
+
+        fprintf(fptr, "%d %s %d %s %d %s\n",
+                currentNode->patient->id, name,
+                currentNode->patient->age, diagnosis,
+                currentNode->patient->roomNumbers, dateString);
+
+        currentNode = currentNode->next;
     }
-
-    fprintf(fptr, "%d %s %d %s %d\n", id, name, age, diagnosis, roomNumber);
 
     fclose(fptr);
 }
@@ -225,7 +286,7 @@ void addPatient(struct LinkedList* patientList)
         roomNumberValid = 1;
     }
 
-    createPatientToList(patientList, id, name, age, diagnosis, roomNumber);
+    createPatientToList(patientList, id, name, age, diagnosis, roomNumber, NULL);
     writePatientToSaveFile(id, name, age, diagnosis, roomNumber);
 }
 
@@ -234,7 +295,8 @@ void createPatientToList(struct LinkedList* patientList,
                          char* name,
                          int age,
                          char* diagnosis,
-                         int roomNumber)
+                         int roomNumber,
+                         struct Date* dischargeDate)
 {
     struct listNode* createdNode = malloc(sizeof(struct listNode));
 
@@ -252,26 +314,15 @@ void createPatientToList(struct LinkedList* patientList,
         return;
     }
 
-    //To get rid of the underscores within the text when loading them into patientList
-    for (int i = 0; i < 50; i++)
-    {
-        if (name[i] == '_')
-        {
-            name[i] = ' ';
-        }
-
-        if (diagnosis[i] == '_')
-        {
-            diagnosis[i] = ' ';
-        }
-    }
+    replaceUnderscoresWithSpaces(name);
+    replaceUnderscoresWithSpaces(diagnosis);
 
     createdNode->patient->id = id;
     createdNode->patient->age = age;
     createdNode->patient->roomNumbers = roomNumber;
     strcpy(createdNode->patient->name, name);
     strcpy(createdNode->patient->diagnosis, diagnosis);
-    createdNode->patient->dischargeDate = NULL;
+    createdNode->patient->dischargeDate = dischargeDate;
 
     struct listNode* current = patientList->head;
     struct listNode* prevNode = NULL;
@@ -356,9 +407,15 @@ void dischargePatient(struct LinkedList* patientList)
         //Check for matching Id's
         if (currentNode->patient->id == id)
         {
+            if (currentNode->patient->dischargeDate != NULL)
+            {
+                printf("The patient is already discharged\n");
+                return;
+            }
+
             currentNode->patient->dischargeDate = dischargeDate;
 
-            printf("Successfully discharged patient #%d\n", id);
+            printf("\nSuccessfully discharged patient #%d\n", id);
             return;
         }
 
@@ -419,7 +476,7 @@ void viewAllPatients(const struct LinkedList* patientList)
     while (currentNode != NULL)
     {
         struct Patient* nodePatient = currentNode->patient;
-        char dischargedDateString[50];
+        char dischargedDateString[50] = "Not Discharged";
 
         dateToString(nodePatient->dischargeDate, dischargedDateString);
 
@@ -541,6 +598,7 @@ void dateToString(const struct Date* date,
     sprintf(monthString, "%d", date->month);
     sprintf(yearString, "%d", date->year);
 
+    strcpy(string, "");
     strcat(string, dayString);
     strcat(string, "/");
     strcat(string, monthString);
@@ -563,6 +621,55 @@ int initializeDate(struct Date* date,
     date->year = year;
 
     return 1;
+}
+
+void parseDate(struct Date** date,
+               char* dateString)
+{
+    int day = 0;
+    int month = 0;
+    int year = 0;
+    int dateSection = 0;
+    char *endptr;
+
+    char* token = strtok(dateString, "/");
+
+    while (token != NULL && dateSection < 3)
+    {
+        switch (dateSection)
+        {
+        case 0:
+            day = (int)strtol(token, &endptr, 10);
+            break;
+        case 1:
+            month = (int)strtol(token, &endptr, 10);
+            break;
+        case 2:
+            year = (int)strtol(token, &endptr, 10);
+            break;
+        }
+
+        if (*endptr != '\0') {
+            printf("%s", token);
+            printf("Couldn't convert data properly. Please check the dateString\n");
+            return;
+        }
+
+        token = strtok(NULL, "/");
+        dateSection++;
+    }
+
+    *date = malloc(sizeof(struct Date));
+
+    if (*date == NULL)
+    {
+        printf("Could not allocate memory to date\n");
+        return;
+    }
+
+    (*date)->day = day;
+    (*date)->month = month;
+    (*date)->year = year;
 }
 
 int validateDate(int day,

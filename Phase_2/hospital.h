@@ -43,7 +43,8 @@ void createPatientToList(struct LinkedList* patientList,
                          char* name,
                          int age,
                          char* diagnosis,
-                         int roomNumber);
+                         int roomNumber,
+                         struct Date* dischargeDate);
 
 void writePatientToSaveFile(int id,
                             char* name,
@@ -63,7 +64,12 @@ int initializeDate(struct Date* date,
 void dateToString(const struct Date* date,
                   char* string);
 
+void parseDate(struct Date** date,
+               char* dateString);
+
 void loadSaveFile(struct LinkedList* patientList);
+
+void writeAllPatientsToSaveFile(const struct LinkedList* patientList);
 
 void ReportsAndAnalyticsMenu(const struct LinkedList* patientList);
 
