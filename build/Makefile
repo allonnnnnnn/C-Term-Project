@@ -129,6 +129,30 @@ TermProject/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/TermProject.dir/build.make CMakeFiles/TermProject.dir/build
 .PHONY : TermProject/fast
 
+Phase_2/Date.obj: Phase_2/Date.c.obj
+.PHONY : Phase_2/Date.obj
+
+# target to build an object file
+Phase_2/Date.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/TermProject.dir/build.make CMakeFiles/TermProject.dir/Phase_2/Date.c.obj
+.PHONY : Phase_2/Date.c.obj
+
+Phase_2/Date.i: Phase_2/Date.c.i
+.PHONY : Phase_2/Date.i
+
+# target to preprocess a source file
+Phase_2/Date.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/TermProject.dir/build.make CMakeFiles/TermProject.dir/Phase_2/Date.c.i
+.PHONY : Phase_2/Date.c.i
+
+Phase_2/Date.s: Phase_2/Date.c.s
+.PHONY : Phase_2/Date.s
+
+# target to generate assembly for a file
+Phase_2/Date.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/TermProject.dir/build.make CMakeFiles/TermProject.dir/Phase_2/Date.c.s
+.PHONY : Phase_2/Date.c.s
+
 Phase_2/hospital.obj: Phase_2/hospital.c.obj
 .PHONY : Phase_2/hospital.obj
 
@@ -162,6 +186,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... TermProject"
+	@echo "... Phase_2/Date.obj"
+	@echo "... Phase_2/Date.i"
+	@echo "... Phase_2/Date.s"
 	@echo "... Phase_2/hospital.obj"
 	@echo "... Phase_2/hospital.i"
 	@echo "... Phase_2/hospital.s"

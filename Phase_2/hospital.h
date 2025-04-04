@@ -79,9 +79,9 @@ void searchPatientMenu(struct LinkedList* patientList);
 
 void searchPatientByID(struct LinkedList* patientList);
 
-void searchPatientByName(struct LinkedList* patientList);
+void searchPatientByName(const struct LinkedList* patientList);
 
-void dischargePatient(struct LinkedList* patientList);
+void dischargePatient(const struct LinkedList* patientList);
 
 void manageDoctors();
 

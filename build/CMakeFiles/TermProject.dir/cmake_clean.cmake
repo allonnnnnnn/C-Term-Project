@@ -1,4 +1,5 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/TermProject.dir/Phase_2/Date.c.obj"
   "CMakeFiles/TermProject.dir/Phase_2/hospital.c.obj"
   "TermProject.exe"
   "TermProject.exe.manifest"

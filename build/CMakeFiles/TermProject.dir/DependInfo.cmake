@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
+  "C:/Users/allan/Documents/Comp2510/TermProject/Phase_2/Date.c" "C:/Users/allan/Documents/Comp2510/TermProject/build/CMakeFiles/TermProject.dir/Phase_2/Date.c.obj"
   "C:/Users/allan/Documents/Comp2510/TermProject/Phase_2/hospital.c" "C:/Users/allan/Documents/Comp2510/TermProject/build/CMakeFiles/TermProject.dir/Phase_2/hospital.c.obj"
   )
 
