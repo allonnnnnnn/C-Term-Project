@@ -29,10 +29,42 @@ void dateToString(const struct Date* date,
     strcat(string, yearString);
 }
 
+void promptDateInitialization(struct Date* date)
+{
+    int dateInitializationStatus;
+    int year;
+    int month;
+    int day;
+
+    dateInitializationStatus = 0;
+    year = 0;
+    month = 0;
+    day = 0;
+
+    while (dateInitializationStatus == 0)
+    {
+        printf("\nPlease input the day:\n");
+        scanf("%d", &day);
+
+        printf("\nPlease input the month:\n");
+        scanf("%d", &month);
+
+        printf("\nPlease input the year:\n");
+        scanf("%d", &year);
+
+        dateInitializationStatus = initializeDate(date, day, month, year);
+
+        if (dateInitializationStatus == 0)
+        {
+            printf("Please try again\n");
+        }
+    }
+}
+
 int initializeDate(struct Date* date,
-                   int day,
-                   int month,
-                   int year)
+                   const int day,
+                   const int month,
+                   const int year)
 {
     if (!validateDate(day, month, year))
     {
@@ -70,6 +102,7 @@ void parseDate(struct Date** date,
         case 2:
             year = (int)strtol(token, &endptr, 10);
             break;
+        default: ;
         }
 
         if (*endptr != '\0')
@@ -113,7 +146,7 @@ int validateDate(const int day,
     }
 
     // Days in each month
-    int daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    const int daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
     if (day < 1 || day > daysInMonth[month - 1])
     {
