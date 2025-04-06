@@ -5,8 +5,13 @@
 
 #define CURRENT_YEAR 2025
 
-void dateToString(const struct Date* date,
-                  char* string)
+/**
+ * Converts a Date struct into a string formatted as day/month/year.
+ *
+ * @param date Pointer to a Date struct. If NULL, the function does nothing.
+ * @param string Buffer to hold the resulting date string (e.g., "1/1/2025").
+ */
+void dateToString(const struct Date* date, char* string)
 {
     if (date == NULL)
     {
@@ -29,17 +34,18 @@ void dateToString(const struct Date* date,
     strcat(string, yearString);
 }
 
+/**
+ * Continuously prompts the user for day, month, and year until a valid date is entered.
+ * The valid date is then assigned to the passed-in Date struct.
+ *
+ * @param date Pointer to the Date struct to initialize.
+ */
 void promptDateInitialization(struct Date* date)
 {
-    int dateInitializationStatus;
-    int year;
-    int month;
-    int day;
-
-    dateInitializationStatus = 0;
-    year = 0;
-    month = 0;
-    day = 0;
+    int dateInitializationStatus = 0;
+    int year = 0;
+    int month = 0;
+    int day = 0;
 
     while (dateInitializationStatus == 0)
     {
@@ -61,10 +67,16 @@ void promptDateInitialization(struct Date* date)
     }
 }
 
-int initializeDate(struct Date* date,
-                   const int day,
-                   const int month,
-                   const int year)
+/**
+ * Initializes a Date struct with the given day, month, and year, provided it's a valid date.
+ *
+ * @param date Pointer to the Date struct to be initialized.
+ * @param day The day of the month.
+ * @param month The month (1-12).
+ * @param year The year (must pass validateDate check).
+ * @return 1 if successful, 0 if validation fails.
+ */
+int initializeDate(struct Date* date, const int day, const int month, const int year)
 {
     if (!validateDate(day, month, year))
     {
@@ -78,8 +90,13 @@ int initializeDate(struct Date* date,
     return 1;
 }
 
-void parseDate(struct Date** date,
-               char* dateString)
+/**
+ * Parses a date string of the form "day/month/year" into a newly allocated Date struct.
+ *
+ * @param date Pointer to a Date* that will be allocated and populated.
+ * @param dateString The input string containing the date in the format "d/m/yyyy".
+ */
+void parseDate(struct Date** date, char* dateString)
 {
     int day = 0;
     int month = 0;
@@ -87,24 +104,26 @@ void parseDate(struct Date** date,
     int dateSection = 0;
     char* endptr;
 
+    // Tokenize by '/'
     char* token = strtok(dateString, "/");
 
     while (token != NULL && dateSection < 3)
     {
         switch (dateSection)
         {
-        case 0:
-            day = (int)strtol(token, &endptr, 10);
-            break;
-        case 1:
-            month = (int)strtol(token, &endptr, 10);
-            break;
-        case 2:
-            year = (int)strtol(token, &endptr, 10);
-            break;
-        default: ;
+            case 0:
+                day = (int)strtol(token, &endptr, 10);
+                break;
+            case 1:
+                month = (int)strtol(token, &endptr, 10);
+                break;
+            case 2:
+                year = (int)strtol(token, &endptr, 10);
+                break;
+            default: ; // Should never get here, but included for clarity
         }
 
+        // If there was any non-numeric data in the token
         if (*endptr != '\0')
         {
             printf("%s", token);
@@ -120,7 +139,7 @@ void parseDate(struct Date** date,
 
     if (*date == NULL)
     {
-        printf("Could not allocate memory to date\n");
+        printf("Could not allocate memory for date\n");
         return;
     }
 
@@ -129,25 +148,41 @@ void parseDate(struct Date** date,
     (*date)->year = year;
 }
 
-int validateDate(const int day,
-                 const int month,
-                 const int year)
+/**
+ * Checks if the provided day, month, and year form a valid date.
+ * Includes a leap-year check to allow February 29 on leap years.
+ *
+ * @param day The day of the month.
+ * @param month The month (1-12).
+ * @param year The year (between 1900 and CURRENT_YEAR, inclusive).
+ * @return 1 if valid, 0 otherwise.
+ */
+int validateDate(const int day, const int month, const int year)
 {
+    // Basic range checks for year
     if (year < 1900 || year > CURRENT_YEAR)
     {
         printf("Invalid Year\n");
         return 0;
     }
 
+    // Basic range check for month
     if (month < 1 || month > 12)
     {
         printf("Invalid Month\n");
         return 0;
     }
 
-    // Days in each month
-    const int daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    // Days in each month (non-leap year) by default
+    int daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
+    // Adjust for leap year in February
+    if ((year % 400 == 0) || (year % 4 == 0 && year % 100 != 0))
+    {
+        daysInMonth[1] = 29;
+    }
+
+    //Will return 0 if the date is lower than 1 and higher than whatever the upper bound is according to the month
     if (day < 1 || day > daysInMonth[month - 1])
     {
         printf("Invalid Day\n");
@@ -156,5 +191,3 @@ int validateDate(const int day,
 
     return 1;
 }
-
-

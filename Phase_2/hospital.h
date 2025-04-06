@@ -26,13 +26,6 @@ struct Patient
     struct Date* dischargeDate;
 };
 
-struct DoctorShift
-{
-    char doctorName[MAX_CHAR_LENGTH];
-    int weekNumber;
-    int dayOfWeek; // 0-6
-};
-
 struct Date
 {
     int day;

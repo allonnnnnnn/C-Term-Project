@@ -3,6 +3,12 @@
 #include <string.h>
 #include "hospital.h"
 
+/**
+ * The main entry point of the program, initializing data structures,
+ * loading previously saved patient data, and managing the menu system.
+ *
+ * @return int Returns 0 upon successful program termination.
+ */
 int main()
 {
     struct LinkedList patientList = {NULL, 0};
@@ -11,7 +17,7 @@ int main()
     int doctorNum = 0;
     int input = 1;
 
-    //Initialize all schedule to -1
+    // Checking if the doctorSchedule cell is 0; if so, set it to -1 to indicate no doctor assigned
     for (int i = 0; i < MAX_DAYS; i++)
     {
         for (int j = 0; j < MAX_SECTIONS_OF_DAY; j++)
@@ -23,19 +29,19 @@ int main()
         }
     }
 
-    //Loading previous saved patients
+    // Loads previously saved patients from file, if available
     loadSaveFile(&patientList);
 
     while (input != 6)
     {
         printf("\nMAIN MENU\n"
-            "1. Add Patient Record\n"
-            "2. Reporting and Analytics Menu\n"
-            "3. Search Patient Menu\n"
-            "4. Discharge Patient\n"
-            "5. Manage Doctor Schedule\n"
-            "6. Exit\n"
-            "Please input your option:\n");
+               "1. Add Patient Record\n"
+               "2. Reporting and Analytics Menu\n"
+               "3. Search Patient Menu\n"
+               "4. Discharge Patient\n"
+               "5. Manage Doctor Schedule\n"
+               "6. Exit\n"
+               "Please input your option:\n");
 
         scanf("%d", &input);
 
@@ -68,9 +74,29 @@ int main()
         }
     }
 
-    //TODO: free up all the nodes' memory within the linkedlist, for you lil arshy
+    // Frees the memory allocated for each listNode and its patient data
+    struct listNode* current = patientList.head;
+
+    while (current != NULL)
+    {
+        struct listNode* nextNode = current->next;
+
+        //These are all the data that we malloc'd so we are
+        //now deallocating them with free
+        free(current->patient->dischargeDate);
+        free(current->patient->admissionDate);
+        free(current->patient);
+        free(current);
+
+        current = nextNode;
+    }
 }
 
+/**
+ * Replaces all spaces in a string with underscores.
+ *
+ * @param string The string in which spaces will be replaced.
+ */
 void replaceSpacesWithUnderscores(char* string)
 {
     for (int i = 0; i < strlen(string); i++)
@@ -87,6 +113,11 @@ void replaceSpacesWithUnderscores(char* string)
     }
 }
 
+/**
+ * Replaces all underscores in a string with spaces.
+ *
+ * @param string The string in which underscores will be replaced.
+ */
 void replaceUnderscoresWithSpaces(char* string)
 {
     for (int i = 0; i < strlen(string); i++)
@@ -103,6 +134,12 @@ void replaceUnderscoresWithSpaces(char* string)
     }
 }
 
+/**
+ * Loads patient data from 'saveFile.txt' into the linked list, if the file exists.
+ * If the file doesn't exist, creates a new one instead.
+ *
+ * @param patientList Pointer to the LinkedList to populate with patient data.
+ */
 void loadSaveFile(struct LinkedList* patientList)
 {
     FILE* fptr;
@@ -126,19 +163,28 @@ void loadSaveFile(struct LinkedList* patientList)
         fscanf(fptr, "%d %s %d %s %d %s %s",
                &id, name, &age, diagnosis, &roomNumber, admittedDateString, dischargedDateString);
 
+        //Repeats until it hits the end of the file
         while (!feof(fptr))
         {
             struct Date* dischargedDate = NULL;
             struct Date* admittedDate = NULL;
 
+            //Check if we have a discharged date in the line
+            //If so, parse it and put it inside our dischargedDate Date pointer
             if (strcmp(dischargedDateString, "null") != 0)
             {
                 parseDate(&dischargedDate, dischargedDateString);
             }
+
+            //MUST have an admittedDateString to be parsed and put inside
+            //admittedDate Date pointer
             parseDate(&admittedDate, admittedDateString);
 
+            //Once all the data is ready, we can create a patient with the data fetched
+            //from the file and append it to the linkedlist
             createPatientToList(patientList, id, name, age, diagnosis, roomNumber, admittedDate, dischargedDate);
 
+            //Preparing the next line to be read
             fscanf(fptr, "%d %s %d %s %d %s %s",
                    &id, name, &age, diagnosis, &roomNumber, admittedDateString, dischargedDateString);
         }
@@ -148,6 +194,16 @@ void loadSaveFile(struct LinkedList* patientList)
     }
 }
 
+/**
+ * Appends a SINGLE patient's data to 'saveFile.txt'.
+ *
+ * @param id Unique identifier for the patient.
+ * @param name Name of the patient.
+ * @param age Age of the patient.
+ * @param diagnosis Patient's diagnosis or condition.
+ * @param roomNumber The patient's assigned room number.
+ * @param dateAdmitted Pointer to a Date struct for the admission date.
+ */
 void writePatientToSaveFile(const int id,
                             char name[50],
                             const int age,
@@ -160,6 +216,8 @@ void writePatientToSaveFile(const int id,
 
     dateToString(dateAdmitted, dateAdmittedString);
 
+    //Ensures that the string are supposed to be connected so that
+    //it can be properly parsed by spaces
     replaceSpacesWithUnderscores(name);
     replaceSpacesWithUnderscores(diagnosis);
 
@@ -169,6 +227,11 @@ void writePatientToSaveFile(const int id,
     fclose(fptr);
 }
 
+/**
+ * Overwrites 'saveFile.txt' with ALL patients currently in the linked list.
+ *
+ * @param patientList Pointer to the LinkedList containing patient data to write.
+ */
 void writeAllPatientsToSaveFile(const struct LinkedList* patientList)
 {
     FILE* fptr = fopen("saveFile.txt", "w");
@@ -180,13 +243,18 @@ void writeAllPatientsToSaveFile(const struct LinkedList* patientList)
         char name[50];
         char diagnosis[50];
 
+        //Convert from its day, month, and year property into a string date format (dd/mm/yyyy)
         dateToString(currentNode->patient->dischargeDate, dateString);
 
         strcpy(name, currentNode->patient->name);
         strcpy(diagnosis, currentNode->patient->diagnosis);
+
+        //Ensures that the string are supposed to be connected so that
+        //it can be properly parsed by spaces
         replaceSpacesWithUnderscores(name);
         replaceSpacesWithUnderscores(diagnosis);
 
+        //Prints to the file
         fprintf(fptr, "%d %s %d %s %d %s\n",
                 currentNode->patient->id, name,
                 currentNode->patient->age, diagnosis,
@@ -198,6 +266,14 @@ void writeAllPatientsToSaveFile(const struct LinkedList* patientList)
     fclose(fptr);
 }
 
+/**
+ * Checks whether the specified ID already exists in the linked list.
+ * Ensures unique Ids across all patients
+ *
+ * @param patientList Pointer to the LinkedList of patients.
+ * @param id The patient ID to validate.
+ * @return 1 if the ID is found, 0 otherwise.
+ */
 int validateId(const struct LinkedList* patientList,
                const int id)
 {
@@ -216,6 +292,12 @@ int validateId(const struct LinkedList* patientList,
     return 0;
 }
 
+/**
+ * Prompts user input to add a new patient record, validating each field,
+ * then creates and saves the new record.
+ *
+ * @param patientList Pointer to the LinkedList of patients.
+ */
 void addPatient(struct LinkedList* patientList)
 {
     int id;
@@ -231,6 +313,7 @@ void addPatient(struct LinkedList* patientList)
     int diagnosisValid = 0;
     int roomNumberValid = 0;
 
+    //Id input
     while (idValid == 0)
     {
         printf("\nEnter in the patient Id:\n");
@@ -246,6 +329,7 @@ void addPatient(struct LinkedList* patientList)
         idValid = 1;
     }
 
+    //Name input
     while (nameValid == 0)
     {
         printf("\nEnter in the patient name:\n");
@@ -261,6 +345,7 @@ void addPatient(struct LinkedList* patientList)
         nameValid = 1;
     }
 
+    //Age input
     while (ageValid == 0)
     {
         printf("\nEnter in the age of the patient:\n");
@@ -276,6 +361,7 @@ void addPatient(struct LinkedList* patientList)
         ageValid = 1;
     }
 
+    //Diagnosis input
     while (diagnosisValid == 0)
     {
         printf("\nEnter in the diagnosis name:\n");
@@ -291,6 +377,7 @@ void addPatient(struct LinkedList* patientList)
         diagnosisValid = 1;
     }
 
+    //Room number input
     while (roomNumberValid == 0)
     {
         printf("\nEnter in the room number:\n");
@@ -313,6 +400,18 @@ void addPatient(struct LinkedList* patientList)
     writePatientToSaveFile(id, name, age, diagnosis, roomNumber, admittedDate);
 }
 
+/**
+ * Inserts a new patient node in ascending order of ID into the patientList.
+ *
+ * @param patientList Pointer to the LinkedList.
+ * @param id Unique identifier for the patient.
+ * @param name Name of the patient.
+ * @param age Age of the patient.
+ * @param diagnosis Diagnosis or condition of the patient.
+ * @param roomNumber The assigned room number.
+ * @param admittedDate Pointer to the Date struct for admission.
+ * @param dischargeDate Pointer to the Date struct for discharge (may be NULL).
+ */
 void createPatientToList(struct LinkedList* patientList,
                          int id,
                          char* name,
@@ -338,9 +437,12 @@ void createPatientToList(struct LinkedList* patientList,
         return;
     }
 
+    //To ensure the strings are just connected and not seperated by spaces
+    //so that it would be properly parsed when it is later read
     replaceUnderscoresWithSpaces(name);
     replaceUnderscoresWithSpaces(diagnosis);
 
+    //Initializing our node and the patient attached to said node we allocated memory for
     createdNode->patient->id = id;
     createdNode->patient->age = age;
     createdNode->patient->roomNumbers = roomNumber;
@@ -352,7 +454,7 @@ void createPatientToList(struct LinkedList* patientList,
     struct listNode* current = patientList->head;
     struct listNode* prevNode = NULL;
 
-    //If no head, we make the head the created node
+    // If no head exists, the newly created node becomes the head
     if (patientList->head == NULL)
     {
         patientList->head = createdNode;
@@ -360,9 +462,11 @@ void createPatientToList(struct LinkedList* patientList,
         return;
     }
 
+    //Performing an insertion sort within the list with the patient's Id
     while (current != NULL)
     {
-        //Sort Id by ascending when inserting them into the linkedlist
+        // Insert before the first larger ID to maintain ascending order
+        // and if less than, return to the caller function
         if (id < current->patient->id)
         {
             prevNode->next = createdNode;
@@ -375,13 +479,16 @@ void createPatientToList(struct LinkedList* patientList,
         current = current->next;
     }
 
-    //Insert created node to the end of linkedlist when it's the biggest
-    //Id within the patient's list
+    // Append to the end if all existing IDs are smaller
     prevNode->next = createdNode;
     patientList->nodeAmount++;
 }
 
-
+/**
+ * Discharges a patient by setting their discharge date if they haven't been discharged already.
+ *
+ * @param patientList Pointer to the LinkedList containing patients.
+ */
 void dischargePatient(const struct LinkedList* patientList)
 {
     if (patientList->nodeAmount == 0)
@@ -407,17 +514,21 @@ void dischargePatient(const struct LinkedList* patientList)
 
     struct listNode* prevNode = NULL;
     struct listNode* currentNode = patientList->head;
+
+    //Loop through all the nodes until it hits null
     while (currentNode != NULL)
     {
-        //Check for matching Id's
+        // Matches the given ID
         if (currentNode->patient->id == id)
         {
+            // Check if already discharged
             if (currentNode->patient->dischargeDate != NULL)
             {
                 printf("The patient is already discharged\n");
                 return;
             }
 
+            //If not discharged, we will add the discharge date to them
             currentNode->patient->dischargeDate = dischargeDate;
 
             printf("\nSuccessfully discharged patient #%d\n", id);
@@ -431,6 +542,13 @@ void dischargePatient(const struct LinkedList* patientList)
     printf("No patient with that Id was found\n");
 }
 
+/**
+ * Provides a submenu to manage doctor schedules: adding doctors or assigning them to shifts.
+ *
+ * @param doctorNames 2D array storing doctor names.
+ * @param doctorSchedule 2D array representing days and shifts.
+ * @param doctorNum Pointer to an integer tracking how many doctors exist.
+ */
 void manageDoctorShifts(char doctorNames[][MAX_CHAR_LENGTH],
                         int doctorSchedule[][MAX_SECTIONS_OF_DAY],
                         int* doctorNum)
@@ -439,10 +557,10 @@ void manageDoctorShifts(char doctorNames[][MAX_CHAR_LENGTH],
     while (input != 3)
     {
         printf("\nDOCTOR SCHEDULE MENU\n"
-            "1. Add Doctors\n"
-            "2. Schedule Doctor Shifts\n"
-            "3. Go Back\n"
-            "Please input your option:\n");
+               "1. Add Doctors\n"
+               "2. Schedule Doctor Shifts\n"
+               "3. Go Back\n"
+               "Please input your option:\n");
         scanf("%d", &input);
 
         switch (input)
@@ -461,6 +579,12 @@ void manageDoctorShifts(char doctorNames[][MAX_CHAR_LENGTH],
     }
 }
 
+/**
+ * Prompts the user to add a new doctor name into the system, with basic validation.
+ *
+ * @param doctors 2D array where each row stores a single doctor's name.
+ * @param doctorNum Pointer to the current count of doctors.
+ */
 void addDoctors(char doctors[][MAX_CHAR_LENGTH],
                 int* doctorNum)
 {
@@ -483,6 +607,13 @@ void addDoctors(char doctors[][MAX_CHAR_LENGTH],
     }
 }
 
+/**
+ * Assigns an existing doctor to a specific day and shift slot.
+ *
+ * @param doctors 2D array of doctor names.
+ * @param doctorSchedule 2D array storing shift assignments (by index).
+ * @param doctorNum Number of doctors currently available.
+ */
 void scheduleDoctors(char doctors[][MAX_CHAR_LENGTH],
                      int doctorSchedule[][MAX_SECTIONS_OF_DAY],
                      int doctorNum)
@@ -512,6 +643,7 @@ void scheduleDoctors(char doctors[][MAX_CHAR_LENGTH],
     doctorIndex -= 1; // convert to 0-based index
 
     int day, section;
+
     printf("Scheduling %s.\n", doctors[doctorIndex]);
     printf("Enter day (0=Sunday, 6=Saturday): ");
     scanf("%d", &day);
@@ -529,10 +661,20 @@ void scheduleDoctors(char doctors[][MAX_CHAR_LENGTH],
         printf("Warning: There is already a doctor scheduled for that time slot.\n");
     }
 
+    //Set that time slot within one of the day of the week to the
+    //doctor's index
     doctorSchedule[day][section] = doctorIndex;
     printf("Successfully scheduled %s on day %d, section %d.\n", doctors[doctorIndex], day, section);
 }
 
+/**
+ * Displays the Reporting and Analytics menu, allowing the user to choose different reports.
+ *
+ * @param patientList Pointer to the LinkedList of patients.
+ * @param doctorNames 2D array of doctor names.
+ * @param doctorShifts 2D array storing day/shift doctor assignments.
+ * @param numDoctors Current number of registered doctors.
+ */
 void ReportsAndAnalyticsMenu(const struct LinkedList* patientList,
                              char doctorNames[][MAX_CHAR_LENGTH],
                              int doctorShifts[][MAX_SECTIONS_OF_DAY],
@@ -543,13 +685,13 @@ void ReportsAndAnalyticsMenu(const struct LinkedList* patientList,
     while (input != 6)
     {
         printf("\nREPORTING AND ANALYTICS\n"
-            "1. View All Patients\n"
-            "2. Total Patients admitted in a day, week, or month\n"
-            "3. Patients Discharged by Day, Week, And Month\n"
-            "4. Doctor Utilization Report\n"
-            "5. Room Usage Statistics\n"
-            "6. Go back\n"
-            "Please input your option:\n");
+               "1. View All Patients\n"
+               "2. Total Patients admitted in a day, week, or month\n"
+               "3. Patients Discharged by Day, Week, And Month\n"
+               "4. Doctor Utilization Report\n"
+               "5. Room Usage Statistics\n"
+               "6. Go back\n"
+               "Please input your option:\n");
 
         scanf("%d", &input);
 
@@ -575,6 +717,11 @@ void ReportsAndAnalyticsMenu(const struct LinkedList* patientList,
     }
 }
 
+/**
+ * Prints all patients in the linked list, including their admission and discharge dates.
+ *
+ * @param patientList Pointer to the LinkedList of patients.
+ */
 void viewAllPatients(const struct LinkedList* patientList)
 {
     if (patientList->nodeAmount == 0)
@@ -586,12 +733,15 @@ void viewAllPatients(const struct LinkedList* patientList)
     printf("\n");
 
     struct listNode* currentNode = patientList->head;
+
+    //Loop through until we hit a null node
     while (currentNode != NULL)
     {
         struct Patient* nodePatient = currentNode->patient;
         char dischargedDateString[50] = "Not Discharged";
         char admittedDateString[50];
 
+        //Convert all dates to a readable format (dd/mm/yyyy)
         dateToString(nodePatient->dischargeDate, dischargedDateString);
         dateToString(nodePatient->admissionDate, admittedDateString);
 
@@ -600,6 +750,7 @@ void viewAllPatients(const struct LinkedList* patientList)
             nodePatient->id, nodePatient->name, nodePatient->age, nodePatient->diagnosis, nodePatient->roomNumbers,
             admittedDateString, dischargedDateString);
 
+        //Reset the dischargedDateString to an empty string
         strcpy(dischargedDateString, "");
         currentNode = currentNode->next;
     }
@@ -607,6 +758,11 @@ void viewAllPatients(const struct LinkedList* patientList)
     printf("\n");
 }
 
+/**
+ * Generates a report of total patients admitted, broken down by year and month, and writes it to 'PatientAdmittedReport.txt'.
+ *
+ * @param patientList Pointer to the LinkedList of patients.
+ */
 void generatePatientsAdmittedReport(const struct LinkedList* patientList)
 {
     FILE* fptr;
@@ -670,6 +826,12 @@ void generatePatientsAdmittedReport(const struct LinkedList* patientList)
     printf("Report generated successfully!\n");
 }
 
+/**
+ * Allows the user to input a target discharge date, then generates a report listing
+ * all patients discharged on that date, saved to 'DischargedPatientsReport.txt'.
+ *
+ * @param patientList Pointer to the LinkedList of patients.
+ */
 void generateDischargedPatientsReport(const struct LinkedList* patientList)
 {
     struct Date* targetDate;
@@ -685,6 +847,7 @@ void generateDischargedPatientsReport(const struct LinkedList* patientList)
         return;
     }
 
+    //Getting the discharge date form the user
     do
     {
         printf("Please input the year discharged:\n");
@@ -736,6 +899,14 @@ void generateDischargedPatientsReport(const struct LinkedList* patientList)
     printf("Discharge report generated successfully!\n");
 }
 
+/**
+ * Generates a doctor utilization report by scanning how many shifts each doctor covered,
+ * saving the results to 'DoctorUtilizationReport.txt'.
+ *
+ * @param doctorNames 2D array of doctor names.
+ * @param doctorShifts 2D array storing each doctor's index for each day/shift combination.
+ * @param numDoctors Number of doctors currently registered in the system.
+ */
 void generateDoctorReport(char doctorNames[][MAX_CHAR_LENGTH],
                           int doctorShifts[][MAX_SECTIONS_OF_DAY],
                           int numDoctors)
@@ -774,11 +945,17 @@ void generateDoctorReport(char doctorNames[][MAX_CHAR_LENGTH],
     printf("Doctor utilization report generated successfully.\n");
 }
 
+/**
+ * Generates a Room Usage Report showing how many patients occupy each room,
+ * along with lists of underutilized or overutilized rooms.
+ *
+ * @param patientList Pointer to the LinkedList of patients.
+ */
 void generateRoomUsageReport(const struct LinkedList* patientList)
 {
     FILE* fptr;
     struct listNode* current;
-    int roomUsage[MAX_ROOMS] = {0}; // Index = room number, Value = count
+    int roomUsage[MAX_ROOMS] = {0}; // Index represents room number, value represents occupancy count
     int i;
 
     fptr = fopen("RoomUsageReport.txt", "w");
@@ -790,7 +967,7 @@ void generateRoomUsageReport(const struct LinkedList* patientList)
 
     current = patientList->head;
 
-    // Count room usage
+    // For each patient, increment the usage of their assigned room
     while (current != NULL)
     {
         int roomNum = current->patient->roomNumbers;
@@ -833,7 +1010,11 @@ void generateRoomUsageReport(const struct LinkedList* patientList)
     printf("Room usage report generated successfully.\n");
 }
 
-
+/**
+ * Displays a menu to search patients by ID or name.
+ *
+ * @param patientList Pointer to the LinkedList of patients.
+ */
 void searchPatientMenu(struct LinkedList* patientList)
 {
     int input = 0;
@@ -841,10 +1022,10 @@ void searchPatientMenu(struct LinkedList* patientList)
     while (input != 3)
     {
         printf("SEARCH PATIENT MENU\n"
-            "1. Search by Id\n"
-            "2. Search by Name\n"
-            "3. Go back\n"
-            "Please input your option:\n");
+               "1. Search by Id\n"
+               "2. Search by Name\n"
+               "3. Go back\n"
+               "Please input your option:\n");
 
         scanf("%d", &input);
 
@@ -860,6 +1041,11 @@ void searchPatientMenu(struct LinkedList* patientList)
     }
 }
 
+/**
+ * Searches patients by an integer ID, printing the patient's details if found.
+ *
+ * @param patientList Pointer to the LinkedList of patients.
+ */
 void searchPatientByID(struct LinkedList* patientList)
 {
     const struct listNode* currentNode;
@@ -889,11 +1075,18 @@ void searchPatientByID(struct LinkedList* patientList)
                    currentNode->patient->diagnosis, currentNode->patient->roomNumbers);
             return;
         }
+        // You should also move to the next node to continue searching beyond the first
+        currentNode = currentNode->next;
     }
 
     printf("Patient was not found");
 }
 
+/**
+ * Searches patients by name, printing the details of each matching patient.
+ *
+ * @param patientList Pointer to the LinkedList of patients.
+ */
 void searchPatientByName(const struct LinkedList* patientList)
 {
     char name[50];
