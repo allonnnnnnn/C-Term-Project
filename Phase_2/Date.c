@@ -111,16 +111,16 @@ void parseDate(struct Date** date, char* dateString)
     {
         switch (dateSection)
         {
-            case 0:
-                day = (int)strtol(token, &endptr, 10);
-                break;
-            case 1:
-                month = (int)strtol(token, &endptr, 10);
-                break;
-            case 2:
-                year = (int)strtol(token, &endptr, 10);
-                break;
-            default: ; // Should never get here, but included for clarity
+        case 0:
+            day = (int)strtol(token, &endptr, 10);
+            break;
+        case 1:
+            month = (int)strtol(token, &endptr, 10);
+            break;
+        case 2:
+            year = (int)strtol(token, &endptr, 10);
+            break;
+        default: ; // Should never get here, but included for clarity
         }
 
         // If there was any non-numeric data in the token
@@ -157,7 +157,9 @@ void parseDate(struct Date** date, char* dateString)
  * @param year The year (between 1900 and CURRENT_YEAR, inclusive).
  * @return 1 if valid, 0 otherwise.
  */
-int validateDate(const int day, const int month, const int year)
+int validateDate(const int day,
+                 const int month,
+                 const int year)
 {
     // Basic range checks for year
     if (year < 1900 || year > CURRENT_YEAR)

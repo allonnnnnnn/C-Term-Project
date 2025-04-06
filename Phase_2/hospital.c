@@ -408,7 +408,7 @@ void addPatient(struct LinkedList* patientList)
     promptDateInitialization(admittedDate);
 
     createPatientToList(patientList, id, name, age, diagnosis, roomNumber, admittedDate, NULL);
-    // writePatientToSaveFile(id, name, age, diagnosis, roomNumber, admittedDate);
+    writePatientToSaveFile(id, name, age, diagnosis, roomNumber, admittedDate);
 }
 
 /**
@@ -898,9 +898,9 @@ void generateDischargedPatientsReport(const struct LinkedList* patientList)
 
         disDate = current->patient->dischargeDate;
 
-        if (disDate != NULL && disDate->day == targetDate->day && disDate->month == targetDate->month && disDate->
-            year
-            == targetDate->year)
+        if (disDate != NULL && disDate->day == targetDate->day &&
+            disDate->month == targetDate->month &&
+            disDate->year == targetDate->year)
         {
             fprintf(fptr, "ID: %d | Name: %s | Age: %d | Diagnosis: %s | Room: %d\n",
                     current->patient->id, current->patient->name, current->patient->age,
