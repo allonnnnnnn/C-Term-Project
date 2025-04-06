@@ -35,13 +35,13 @@ int main()
     while (input != 6)
     {
         printf("\nMAIN MENU\n"
-               "1. Add Patient Record\n"
-               "2. Reporting and Analytics Menu\n"
-               "3. Search Patient Menu\n"
-               "4. Discharge Patient\n"
-               "5. Manage Doctor Schedule\n"
-               "6. Exit\n"
-               "Please input your option:\n");
+            "1. Add Patient Record\n"
+            "2. Reporting and Analytics Menu\n"
+            "3. Search Patient Menu\n"
+            "4. Discharge Patient\n"
+            "5. Manage Doctor Schedule\n"
+            "6. Exit\n"
+            "Please input your option:\n");
 
         scanf("%d", &input);
         getchar();
@@ -245,8 +245,6 @@ void writeAllPatientsToSaveFile(const struct LinkedList* patientList)
         char name[50];
         char diagnosis[50];
 
-
-
         //Convert from its day, month, and year property into a string date format (dd/mm/yyyy)
         dateToString(currentNode->patient->admissionDate, admittedDateString);
         dateToString(currentNode->patient->dischargeDate, dischargedDateString);
@@ -401,10 +399,16 @@ void addPatient(struct LinkedList* patientList)
     }
 
     admittedDate = malloc(sizeof(struct Date));
+    if (admittedDate == NULL)
+    {
+        printf("Could not allocate memory for admittedDate when adding a patient\n");
+        return;
+    }
+
     promptDateInitialization(admittedDate);
 
     createPatientToList(patientList, id, name, age, diagnosis, roomNumber, admittedDate, NULL);
-    writePatientToSaveFile(id, name, age, diagnosis, roomNumber, admittedDate);
+    // writePatientToSaveFile(id, name, age, diagnosis, roomNumber, admittedDate);
 }
 
 /**
@@ -472,12 +476,21 @@ void createPatientToList(struct LinkedList* patientList,
     //Performing an insertion sort within the list with the patient's Id
     while (current != NULL)
     {
-        // Insert before the first larger ID to maintain ascending order
-        // and if less than, return to the caller function
         if (id < current->patient->id)
         {
-            prevNode->next = createdNode;
-            createdNode->next = current;
+            if (prevNode == NULL)
+            {
+                // Inserting at the beginning
+                createdNode->next = patientList->head;
+                patientList->head = createdNode;
+            }
+            else
+            {
+                // Inserting between prevNode and current
+                prevNode->next = createdNode;
+                createdNode->next = current;
+            }
+
             patientList->nodeAmount++;
             return;
         }
@@ -485,6 +498,7 @@ void createPatientToList(struct LinkedList* patientList,
         prevNode = current;
         current = current->next;
     }
+
 
     // Append to the end if all existing IDs are smaller
     prevNode->next = createdNode;
@@ -564,10 +578,10 @@ void manageDoctorShifts(char doctorNames[][MAX_CHAR_LENGTH],
     while (input != 3)
     {
         printf("\nDOCTOR SCHEDULE MENU\n"
-               "1. Add Doctors\n"
-               "2. Schedule Doctor Shifts\n"
-               "3. Go Back\n"
-               "Please input your option:\n");
+            "1. Add Doctors\n"
+            "2. Schedule Doctor Shifts\n"
+            "3. Go Back\n"
+            "Please input your option:\n");
         scanf("%d", &input);
 
         switch (input)
@@ -692,13 +706,13 @@ void ReportsAndAnalyticsMenu(const struct LinkedList* patientList,
     while (input != 6)
     {
         printf("\nREPORTING AND ANALYTICS\n"
-               "1. View All Patients\n"
-               "2. Total Patients admitted in a day, week, or month\n"
-               "3. Patients Discharged by Day, Week, And Month\n"
-               "4. Doctor Utilization Report\n"
-               "5. Room Usage Statistics\n"
-               "6. Go back\n"
-               "Please input your option:\n");
+            "1. View All Patients\n"
+            "2. Total Patients admitted in a day, week, or month\n"
+            "3. Patients Discharged by Day, Week, And Month\n"
+            "4. Doctor Utilization Report\n"
+            "5. Room Usage Statistics\n"
+            "6. Go back\n"
+            "Please input your option:\n");
 
         scanf("%d", &input);
 
@@ -884,7 +898,8 @@ void generateDischargedPatientsReport(const struct LinkedList* patientList)
 
         disDate = current->patient->dischargeDate;
 
-        if (disDate != NULL && disDate->day == targetDate->day && disDate->month == targetDate->month && disDate->year
+        if (disDate != NULL && disDate->day == targetDate->day && disDate->month == targetDate->month && disDate->
+            year
             == targetDate->year)
         {
             fprintf(fptr, "ID: %d | Name: %s | Age: %d | Diagnosis: %s | Room: %d\n",
@@ -1029,10 +1044,10 @@ void searchPatientMenu(struct LinkedList* patientList)
     while (input != 3)
     {
         printf("SEARCH PATIENT MENU\n"
-               "1. Search by Id\n"
-               "2. Search by Name\n"
-               "3. Go back\n"
-               "Please input your option:\n");
+            "1. Search by Id\n"
+            "2. Search by Name\n"
+            "3. Go back\n"
+            "Please input your option:\n");
 
         scanf("%d", &input);
 
