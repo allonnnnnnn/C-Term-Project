@@ -143,56 +143,45 @@ void replaceUnderscoresWithSpaces(char* string)
  */
 void loadSaveFile(struct LinkedList* patientList)
 {
-    FILE* fptr;
-
-    fptr = fopen("saveFile.txt", "r");
+    FILE* fptr = fopen("saveFile.txt", "r");
 
     if (fptr == NULL)
     {
-        fopen("saveFile.txt", "w");
+        fptr = fopen("saveFile.txt", "w");
+        return;
     }
-    else
+
+    char line[256];
+    while (fgets(line, sizeof(line), fptr))
     {
-        int id;
-        char name[50];
-        int age;
-        char diagnosis[50];
-        int roomNumber;
-        char admittedDateString[50];
-        char dischargedDateString[10];
+        int id, age, roomNumber;
+        char name[50], diagnosis[50];
+        char admittedDateString[50], dischargedDateString[50];
 
-        fscanf(fptr, "%d %s %d %s %d %s %s",
-               &id, name, &age, diagnosis, &roomNumber, admittedDateString, dischargedDateString);
+        int fields = sscanf(line, "%d %s %d %s %d %s %s",
+                            &id, name, &age, diagnosis, &roomNumber,
+                            admittedDateString, dischargedDateString);
 
-        //Repeats until it hits the end of the file
-        while (!feof(fptr))
+        if (fields != 7)
         {
-            struct Date* dischargedDate = NULL;
-            struct Date* admittedDate = NULL;
-
-            //Check if we have a discharged date in the line
-            //If so, parse it and put it inside our dischargedDate Date pointer
-            if (strcmp(dischargedDateString, "null") != 0)
-            {
-                parseDate(&dischargedDate, dischargedDateString);
-            }
-
-            //MUST have an admittedDateString to be parsed and put inside
-            //admittedDate Date pointer
-            parseDate(&admittedDate, admittedDateString);
-
-            //Once all the data is ready, we can create a patient with the data fetched
-            //from the file and append it to the linkedlist
-            createPatientToList(patientList, id, name, age, diagnosis, roomNumber, admittedDate, dischargedDate);
-
-            //Preparing the next line to be read
-            fscanf(fptr, "%d %s %d %s %d %s %s",
-                   &id, name, &age, diagnosis, &roomNumber, admittedDateString, dischargedDateString);
+            printf("Warning: Invalid line format:\n%s\n", line);
+            continue;
         }
 
-        printf("Successfully loaded data\n");
-        fclose(fptr);
+        struct Date* admittedDate = NULL;
+        struct Date* dischargedDate = NULL;
+
+        parseDate(&admittedDate, admittedDateString);
+        if (strcmp(dischargedDateString, "null") != 0)
+        {
+            parseDate(&dischargedDate, dischargedDateString);
+        }
+
+        createPatientToList(patientList, id, name, age, diagnosis, roomNumber, admittedDate, dischargedDate);
     }
+
+    fclose(fptr);
+
 }
 
 /**
@@ -259,8 +248,10 @@ void writeAllPatientsToSaveFile(const struct LinkedList* patientList)
 
         //Prints to the file
         fprintf(fptr, "%d %s %d %s %d %s %s\n",
-                currentNode->patient->id, name,
-                currentNode->patient->age, diagnosis,
+                currentNode->patient->id,
+                name,
+                currentNode->patient->age,
+                diagnosis,
                 currentNode->patient->roomNumbers,
                 admittedDateString,
                 dischargedDateString);
