@@ -240,12 +240,16 @@ void writeAllPatientsToSaveFile(const struct LinkedList* patientList)
 
     while (currentNode != NULL)
     {
-        char dateString[10] = "null";
+        char admittedDateString[10] = "null";
+        char dischargedDateString[10] = "null";
         char name[50];
         char diagnosis[50];
 
+
+
         //Convert from its day, month, and year property into a string date format (dd/mm/yyyy)
-        dateToString(currentNode->patient->dischargeDate, dateString);
+        dateToString(currentNode->patient->admissionDate, admittedDateString);
+        dateToString(currentNode->patient->dischargeDate, dischargedDateString);
 
         strcpy(name, currentNode->patient->name);
         strcpy(diagnosis, currentNode->patient->diagnosis);
@@ -256,10 +260,12 @@ void writeAllPatientsToSaveFile(const struct LinkedList* patientList)
         replaceSpacesWithUnderscores(diagnosis);
 
         //Prints to the file
-        fprintf(fptr, "%d %s %d %s %d %s\n",
+        fprintf(fptr, "%d %s %d %s %d %s %s\n",
                 currentNode->patient->id, name,
                 currentNode->patient->age, diagnosis,
-                currentNode->patient->roomNumbers, dateString);
+                currentNode->patient->roomNumbers,
+                admittedDateString,
+                dischargedDateString);
 
         currentNode = currentNode->next;
     }
