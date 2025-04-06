@@ -61,7 +61,7 @@ void writePatientToSaveFile(const int id,
                             const int age,
                             char diagnosis[50],
                             const int roomNumber,
-                            struct Date* dateAdmitted);
+                            const struct Date* dateAdmitted);
 
 int validateDate(int day,
                  int month,

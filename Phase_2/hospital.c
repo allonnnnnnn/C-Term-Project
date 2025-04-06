@@ -44,6 +44,7 @@ int main()
                "Please input your option:\n");
 
         scanf("%d", &input);
+        getchar();
 
         if (input < 0 || input > 6)
         {
@@ -209,7 +210,7 @@ void writePatientToSaveFile(const int id,
                             const int age,
                             char diagnosis[50],
                             const int roomNumber,
-                            struct Date* dateAdmitted)
+                            const struct Date* dateAdmitted)
 {
     FILE* fptr = fopen("saveFile.txt", "a");
     char dateAdmittedString[50];
